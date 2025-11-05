@@ -1,5 +1,6 @@
 package com.crocodile.controller;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.dto.CreateRoomRequest;
 import com.crocodile.dto.CreateRoomResponse;
 import com.crocodile.dto.RoomStateResponse;
@@ -36,7 +37,8 @@ public class RoomController {
             HttpServletRequest request) {
         
         String sessionId = sessionService.getSessionIdFromRequest(request).orElse("");
-        RoomStateResponse response = roomCoordinator.getRoomState(code, sessionId);
+        RoomCode roomCode = RoomCode.of(code);
+        RoomStateResponse response = roomCoordinator.getRoomState(roomCode, sessionId);
         return ResponseEntity.ok(response);
     }
 

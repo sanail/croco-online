@@ -1,5 +1,6 @@
 package com.crocodile.service;
 
+import com.crocodile.domain.Score;
 import com.crocodile.exception.PlayerNotFoundException;
 import com.crocodile.model.Player;
 import com.crocodile.repository.PlayerRepository;
@@ -38,7 +39,7 @@ public class PlayerService {
             .roomId(roomId)
             .sessionId(sessionId)
             .name(playerName)
-            .score(0)
+            .score(Score.zero())
             .isLeader(isFirstPlayer)
             .isActive(true)
             .build();
@@ -78,7 +79,7 @@ public class PlayerService {
     @Transactional
     public void addScore(Long playerId, int points) {
         playerRepository.findById(playerId).ifPresent(player -> {
-            player.setScore(player.getScore() + points);
+            player.addScore(points);
             playerRepository.save(player);
             log.info("Added {} points to player {}. New score: {}", points, player.getName(), player.getScore());
         });
@@ -87,6 +88,15 @@ public class PlayerService {
     @Transactional
     public void addWinScore(Long playerId) {
         addScore(playerId, pointsPerWin);
+    }
+    
+    @Transactional
+    public void setScore(Long playerId, Score score) {
+        playerRepository.findById(playerId).ifPresent(player -> {
+            player.setScore(score);
+            playerRepository.save(player);
+            log.info("Set score for player {} to {}", player.getName(), score);
+        });
     }
 
     @Transactional

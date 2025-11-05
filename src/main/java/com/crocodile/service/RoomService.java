@@ -1,10 +1,10 @@
 package com.crocodile.service;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.exception.RoomNotFoundException;
 import com.crocodile.model.Room;
 import com.crocodile.model.RoomStatus;
 import com.crocodile.repository.RoomRepository;
-import com.crocodile.service.wordprovider.WordProvider;
 import com.crocodile.service.wordprovider.WordProviderFactory;
 import com.crocodile.util.RoomCodeGenerator;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,10 @@ public class RoomService {
 
     @Transactional
     public Room createRoom(String theme, String wordProviderType) {
-        String code = generateUniqueCode();
+        RoomCode code = generateUniqueCode();
         
-        WordProvider wordProvider = wordProviderFactory.getProvider(wordProviderType);
+        // Validate word provider exists
+        wordProviderFactory.getProvider(wordProviderType);
         
         Room room = Room.builder()
             .code(code)
@@ -50,7 +51,7 @@ public class RoomService {
         return savedRoom;
     }
 
-    public Room getRoomByCode(String code) {
+    public Room getRoomByCode(RoomCode code) {
         return roomRepository.findByCode(code)
             .orElseThrow(() -> new RoomNotFoundException("Room not found: " + code));
     }
@@ -84,8 +85,8 @@ public class RoomService {
         });
     }
 
-    private String generateUniqueCode() {
-        String code;
+    private RoomCode generateUniqueCode() {
+        RoomCode code;
         do {
             code = RoomCodeGenerator.generate(codeLength);
         } while (roomRepository.existsByCode(code));

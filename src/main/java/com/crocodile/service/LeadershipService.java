@@ -1,5 +1,6 @@
 package com.crocodile.service;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.exception.InvalidOperationException;
 import com.crocodile.model.Player;
 import com.crocodile.model.Room;
@@ -33,7 +34,7 @@ public class LeadershipService {
      * @param sessionId the player's session ID
      */
     @Transactional
-    public void handlePlayerLeave(String roomCode, String sessionId) {
+    public void handlePlayerLeave(RoomCode roomCode, String sessionId) {
         Room room = roomService.getRoomByCode(roomCode);
         Player player = playerService.getPlayerBySessionId(room.getId(), sessionId)
             .orElseThrow(() -> new InvalidOperationException("Player not found in room"));

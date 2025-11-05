@@ -1,5 +1,8 @@
 package com.crocodile.model;
 
+import com.crocodile.domain.PlayerId;
+import com.crocodile.domain.Score;
+import com.crocodile.model.converter.ScoreConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,8 +31,9 @@ public class Player {
     private String name;
 
     @Column(nullable = false)
+    @Convert(converter = ScoreConverter.class)
     @Builder.Default
-    private Integer score = 0;
+    private Score score = Score.zero();
 
     @Column(name = "is_leader", nullable = false)
     @Builder.Default
@@ -47,6 +51,27 @@ public class Player {
         if (joinedAt == null) {
             joinedAt = LocalDateTime.now();
         }
+        if (score == null) {
+            score = Score.zero();
+        }
+    }
+    
+    /**
+     * Get PlayerId value object for this player
+     * 
+     * @return PlayerId combining sessionId and id
+     */
+    public PlayerId getPlayerId() {
+        return PlayerId.of(this.sessionId, this.id);
+    }
+    
+    /**
+     * Add points to player's score
+     * 
+     * @param points points to add
+     */
+    public void addScore(int points) {
+        this.score = this.score.add(points);
     }
 }
 

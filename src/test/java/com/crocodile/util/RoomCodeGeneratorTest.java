@@ -1,5 +1,6 @@
 package com.crocodile.util;
 
+import com.crocodile.domain.RoomCode;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -11,25 +12,31 @@ class RoomCodeGeneratorTest {
 
     @Test
     void testGenerate_correctLength() {
-        String code = RoomCodeGenerator.generate(6);
-        assertEquals(6, code.length());
-    }
-
-    @Test
-    void testGenerate_differentLength() {
-        String code = RoomCodeGenerator.generate(10);
-        assertEquals(10, code.length());
+        RoomCode code = RoomCodeGenerator.generate(6);
+        assertEquals(6, code.getValue().length());
     }
 
     @Test
     void testGenerate_onlyAllowedCharacters() {
-        String code = RoomCodeGenerator.generate(100);
-        String allowedChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        
-        for (char c : code.toCharArray()) {
-            assertTrue(allowedChars.indexOf(c) >= 0, 
-                "Character " + c + " is not in allowed set");
+        // Generate multiple codes and check all characters
+        for (int i = 0; i < 100; i++) {
+            RoomCode roomCode = RoomCodeGenerator.generate(6);
+            String code = roomCode.getValue();
+            String allowedChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            
+            for (char c : code.toCharArray()) {
+                assertTrue(allowedChars.indexOf(c) >= 0, 
+                    "Character " + c + " is not in allowed set");
+            }
         }
+    }
+    
+    @Test
+    void testGenerate_validRoomCodeObject() {
+        RoomCode code = RoomCodeGenerator.generate(6);
+        assertNotNull(code);
+        assertNotNull(code.getValue());
+        assertEquals(6, code.getValue().length());
     }
 
     @Test
@@ -38,8 +45,8 @@ class RoomCodeGeneratorTest {
         int iterations = 1000;
         
         for (int i = 0; i < iterations; i++) {
-            String code = RoomCodeGenerator.generate(6);
-            codes.add(code);
+            RoomCode code = RoomCodeGenerator.generate(6);
+            codes.add(code.getValue());
         }
         
         // Should generate mostly unique codes
@@ -49,13 +56,17 @@ class RoomCodeGeneratorTest {
 
     @Test
     void testGenerate_noConfusingCharacters() {
-        String code = RoomCodeGenerator.generate(1000);
-        
-        // Should not contain easily confused characters: I, O, 0, 1
-        assertFalse(code.contains("I"));
-        assertFalse(code.contains("O"));
-        assertFalse(code.contains("0"));
-        assertFalse(code.contains("1"));
+        // Generate many codes and verify none contain confusing characters
+        for (int i = 0; i < 1000; i++) {
+            RoomCode roomCode = RoomCodeGenerator.generate(6);
+            String code = roomCode.getValue();
+            
+            // Should not contain easily confused characters: I, O, 0, 1
+            assertFalse(code.contains("I"), "Code contains 'I': " + code);
+            assertFalse(code.contains("O"), "Code contains 'O': " + code);
+            assertFalse(code.contains("0"), "Code contains '0': " + code);
+            assertFalse(code.contains("1"), "Code contains '1': " + code);
+        }
     }
 }
 

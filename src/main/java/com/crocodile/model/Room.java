@@ -1,5 +1,8 @@
 package com.crocodile.model;
 
+import com.crocodile.domain.RoomCode;
+import com.crocodile.domain.WordValue;
+import com.crocodile.model.converter.RoomCodeConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +22,8 @@ public class Room {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 10)
-    private String code;
+    @Convert(converter = RoomCodeConverter.class)
+    private RoomCode code;
 
     @Column(nullable = false, length = 100)
     private String theme;
@@ -55,6 +59,24 @@ public class Room {
     @PreUpdate
     protected void onUpdate() {
         lastActivity = LocalDateTime.now();
+    }
+    
+    /**
+     * Get current word as WordValue domain object
+     * 
+     * @return WordValue or null if no current word
+     */
+    public WordValue getCurrentWordValue() {
+        return currentWord == null ? null : WordValue.fromString(currentWord);
+    }
+    
+    /**
+     * Set current word from WordValue domain object
+     * 
+     * @param wordValue the word value to set
+     */
+    public void setCurrentWordValue(WordValue wordValue) {
+        this.currentWord = wordValue == null ? null : wordValue.getValue();
     }
 }
 

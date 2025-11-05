@@ -1,5 +1,6 @@
 package com.crocodile.repository;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.model.Room;
 import com.crocodile.model.RoomStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
     
-    Optional<Room> findByCode(String code);
+    Optional<Room> findByCode(RoomCode code);
     
-    boolean existsByCode(String code);
+    boolean existsByCode(RoomCode code);
     
     List<Room> findByStatusAndLastActivityBefore(RoomStatus status, LocalDateTime lastActivity);
 }

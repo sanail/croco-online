@@ -1,5 +1,6 @@
 package com.crocodile.controller;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.dto.*;
 import com.crocodile.service.RoomCoordinator;
 import com.crocodile.service.GameRoundService;
@@ -34,7 +35,8 @@ public class GameController {
         String sessionId = sessionService.getOrCreateSessionId(httpRequest, httpResponse);
         log.info("Player {} joining room {}", request.getPlayerName(), roomCode);
         
-        JoinRoomResponse response = roomCoordinator.joinRoom(roomCode, sessionId, request.getPlayerName());
+        RoomCode code = RoomCode.of(roomCode);
+        JoinRoomResponse response = roomCoordinator.joinRoom(code, sessionId, request.getPlayerName());
         return ResponseEntity.ok(response);
     }
 
@@ -48,7 +50,8 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Player submitting guess in room {}", roomCode);
-        GuessResponse response = gameRoundService.submitGuess(roomCode, sessionId, request.getGuess());
+        RoomCode code = RoomCode.of(roomCode);
+        GuessResponse response = gameRoundService.submitGuess(code, sessionId, request.getGuess());
         return ResponseEntity.ok(response);
     }
 
@@ -62,7 +65,8 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Leader assigning winner in room {}", roomCode);
-        GuessResponse response = gameRoundService.assignWinner(roomCode, sessionId, request.getWinnerId());
+        RoomCode code = RoomCode.of(roomCode);
+        GuessResponse response = gameRoundService.assignWinner(code, sessionId, request.getWinnerId());
         return ResponseEntity.ok(response);
     }
 
@@ -75,7 +79,8 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Generating new word for room {}", roomCode);
-        NewWordResponse response = gameRoundService.generateNewWord(roomCode, sessionId);
+        RoomCode code = RoomCode.of(roomCode);
+        NewWordResponse response = gameRoundService.generateNewWord(code, sessionId);
         return ResponseEntity.ok(response);
     }
 
@@ -88,7 +93,8 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Player leaving room {}", roomCode);
-        leadershipService.handlePlayerLeave(roomCode, sessionId);
+        RoomCode code = RoomCode.of(roomCode);
+        leadershipService.handlePlayerLeave(code, sessionId);
         return ResponseEntity.ok().build();
     }
 }

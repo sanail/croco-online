@@ -1,5 +1,7 @@
 package com.crocodile.util;
 
+import com.crocodile.domain.WordValue;
+
 public class StringSimilarity {
 
     /**
@@ -65,6 +67,17 @@ public class StringSimilarity {
         }
         
         return false;
+    }
+    
+    /**
+     * Check if guess matches the WordValue (exact or with minor typos)
+     * 
+     * @param word the WordValue object
+     * @param guess the player's guess
+     * @return true if guess is correct
+     */
+    public static boolean isCorrectGuess(WordValue word, String guess) {
+        return isCorrectGuess(word.getValue(), guess);
     }
 }
 

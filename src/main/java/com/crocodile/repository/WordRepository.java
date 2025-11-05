@@ -19,4 +19,3 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     @Query(value = "SELECT * FROM words WHERE theme = :theme ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Word findRandomByTheme(@Param("theme") String theme);
 }
-

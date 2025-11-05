@@ -1,5 +1,6 @@
 package com.crocodile.service;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.dto.CreateRoomResponse;
 import com.crocodile.dto.JoinRoomResponse;
 import com.crocodile.dto.PlayerDto;
@@ -48,8 +49,8 @@ public class RoomCoordinator {
         Room room = roomService.createRoom(theme, wordProviderType);
         
         return CreateRoomResponse.builder()
-            .roomCode(room.getCode())
-            .roomUrl("/room/" + room.getCode())
+            .roomCode(room.getCode().getValue())
+            .roomUrl("/room/" + room.getCode().getValue())
             .theme(room.getTheme())
             .build();
     }
@@ -63,7 +64,7 @@ public class RoomCoordinator {
      * @return join response with player information
      */
     @Transactional
-    public JoinRoomResponse joinRoom(String roomCode, String sessionId, String playerName) {
+    public JoinRoomResponse joinRoom(RoomCode roomCode, String sessionId, String playerName) {
         Room room = roomService.getRoomByCode(roomCode);
         
         long playerCount = playerService.getActivePlayerCount(room.getId());
@@ -92,7 +93,7 @@ public class RoomCoordinator {
      * @param sessionId the requesting player's session ID
      * @return complete room state with players and current word (if applicable)
      */
-    public RoomStateResponse getRoomState(String roomCode, String sessionId) {
+    public RoomStateResponse getRoomState(RoomCode roomCode, String sessionId) {
         Room room = roomService.getRoomByCode(roomCode);
         List<Player> players = playerService.getActivePlayers(room.getId());
         
@@ -115,7 +116,7 @@ public class RoomCoordinator {
             .collect(Collectors.toList());
         
         return RoomStateResponse.builder()
-            .roomCode(room.getCode())
+            .roomCode(room.getCode().getValue())
             .theme(room.getTheme())
             .status(room.getStatus().name())
             .currentWord(currentWord)
@@ -147,7 +148,7 @@ public class RoomCoordinator {
         return PlayerDto.builder()
             .id(player.getId())
             .name(player.getName())
-            .score(player.getScore())
+            .score(player.getScore().getValue())
             .isLeader(player.getIsLeader())
             .isActive(player.getIsActive())
             .build();

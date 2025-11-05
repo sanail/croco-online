@@ -1,5 +1,6 @@
 package com.crocodile.service;
 
+import com.crocodile.domain.RoomCode;
 import com.crocodile.dto.GuessResponse;
 import com.crocodile.dto.NewWordResponse;
 import com.crocodile.exception.InvalidOperationException;
@@ -53,7 +54,7 @@ public class GameRoundService {
      * @return result of the guess
      */
     @Transactional
-    public GuessResponse submitGuess(String roomCode, String sessionId, String guess) {
+    public GuessResponse submitGuess(RoomCode roomCode, String sessionId, String guess) {
         Room room = roomService.getRoomByCode(roomCode);
         Player player = playerService.getPlayerBySessionId(room.getId(), sessionId)
             .orElseThrow(() -> new InvalidOperationException("Player not found in room"));
@@ -87,7 +88,7 @@ public class GameRoundService {
      * @return result of the assignment
      */
     @Transactional
-    public GuessResponse assignWinner(String roomCode, String sessionId, Long winnerId) {
+    public GuessResponse assignWinner(RoomCode roomCode, String sessionId, Long winnerId) {
         Room room = roomService.getRoomByCode(roomCode);
         Player leader = playerService.getPlayerBySessionId(room.getId(), sessionId)
             .orElseThrow(() -> new InvalidOperationException("Player not found in room"));
@@ -113,7 +114,7 @@ public class GameRoundService {
      * @return the generated word
      */
     @Transactional
-    public NewWordResponse generateNewWord(String roomCode, String sessionId) {
+    public NewWordResponse generateNewWord(RoomCode roomCode, String sessionId) {
         Room room = roomService.getRoomByCode(roomCode);
         Player player = playerService.getPlayerBySessionId(room.getId(), sessionId)
             .orElseThrow(() -> new InvalidOperationException("Player not found in room"));
