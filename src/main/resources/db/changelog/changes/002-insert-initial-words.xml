@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-insert-animals-words" author="system">
+        <insert tableName="words"><column name="word" value="Кошка"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Собака"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Слон"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Жираф"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Медведь"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Лиса"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Заяц"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Волк"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Тигр"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Лев"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Обезьяна"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Крокодил"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Пингвин"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Дельфин"/><column name="theme" value="Животные"/></insert>
+        <insert tableName="words"><column name="word" value="Кенгуру"/><column name="theme" value="Животные"/></insert>
+    </changeSet>
+
+    <changeSet id="006-insert-professions-words" author="system">
+        <insert tableName="words"><column name="word" value="Врач"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Учитель"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Программист"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Повар"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Пожарный"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Полицейский"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Художник"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Музыкант"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Актёр"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Водитель"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Строитель"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Юрист"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Инженер"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Журналист"/><column name="theme" value="Профессии"/></insert>
+        <insert tableName="words"><column name="word" value="Фотограф"/><column name="theme" value="Профессии"/></insert>
+    </changeSet>
+
+    <changeSet id="007-insert-household-items-words" author="system">
+        <insert tableName="words"><column name="word" value="Стул"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Стол"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Кровать"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Шкаф"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Диван"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Лампа"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Зеркало"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Телевизор"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Холодильник"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Пылесос"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Утюг"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Чайник"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Микроволновка"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Подушка"/><column name="theme" value="Предметы быта"/></insert>
+        <insert tableName="words"><column name="word" value="Одеяло"/><column name="theme" value="Предметы быта"/></insert>
+    </changeSet>
+
+    <changeSet id="008-insert-movies-words" author="system">
+        <insert tableName="words"><column name="word" value="Титаник"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Матрица"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Мстители"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Гладиатор"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Интерстеллар"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Начало"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Крёстный отец"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Терминатор"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Аватар"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Форрест Гамп"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Игра Престолов"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Друзья"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Шерлок"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Бумажный дом"/><column name="theme" value="Фильмы и сериалы"/></insert>
+        <insert tableName="words"><column name="word" value="Во все тяжкие"/><column name="theme" value="Фильмы и сериалы"/></insert>
+    </changeSet>
+
+    <changeSet id="009-insert-food-words" author="system">
+        <insert tableName="words"><column name="word" value="Пицца"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Бургер"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Паста"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Суши"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Борщ"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Салат"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Торт"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Мороженое"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Кофе"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Чай"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Сок"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Шоколад"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Хлеб"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Яблоко"/><column name="theme" value="Еда и напитки"/></insert>
+        <insert tableName="words"><column name="word" value="Банан"/><column name="theme" value="Еда и напитки"/></insert>
+    </changeSet>
+
+    <changeSet id="010-insert-sports-words" author="system">
+        <insert tableName="words"><column name="word" value="Футбол"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Баскетбол"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Волейбол"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Теннис"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Хоккей"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Плавание"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Бег"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Бокс"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Гимнастика"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Йога"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Шахматы"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Лыжи"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Сноуборд"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Гольф"/><column name="theme" value="Спорт"/></insert>
+        <insert tableName="words"><column name="word" value="Карате"/><column name="theme" value="Спорт"/></insert>
+    </changeSet>
+
+    <changeSet id="011-insert-cities-words" author="system">
+        <insert tableName="words"><column name="word" value="Москва"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Санкт-Петербург"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Париж"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Лондон"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Нью-Йорк"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Токио"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Берлин"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Рим"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Россия"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="США"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Франция"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Германия"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Италия"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Испания"/><column name="theme" value="Города и страны"/></insert>
+        <insert tableName="words"><column name="word" value="Китай"/><column name="theme" value="Города и страны"/></insert>
+    </changeSet>
+
+</databaseChangeLog>
+

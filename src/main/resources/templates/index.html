@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра "Крокодил" - Главная</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐊 Игра "Крокодил"</h1>
+            <p class="subtitle">Показывай слова жестами и угадывай вместе с друзьями!</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Создать новую комнату</h2>
+                <form id="createRoomForm">
+                    <div class="form-group">
+                        <label for="theme">Выберите тему:</label>
+                        <select id="theme" name="theme" required>
+                            <option value="">-- Выберите тему --</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Создать комнату</button>
+                </form>
+                <div id="error-message" class="error-message"></div>
+                <div id="room-link" class="room-link"></div>
+            </div>
+
+            <div class="card">
+                <h2>Как играть?</h2>
+                <ol class="instructions">
+                    <li>Создайте комнату и выберите тему</li>
+                    <li>Поделитесь ссылкой с друзьями</li>
+                    <li>Первый зашедший становится ведущим</li>
+                    <li>Ведущий генерирует слово и показывает его жестами</li>
+                    <li>Другие игроки пытаются угадать слово</li>
+                    <li>Угадавший становится новым ведущим!</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h2>Режимы игры</h2>
+                <div class="modes">
+                    <div class="mode">
+                        <h3>🏠 Оффлайн режим</h3>
+                        <p>Все игроки в одной комнате. Используйте интерфейс для генерации слов и ведения счёта.</p>
+                    </div>
+                    <div class="mode">
+                        <h3>🌐 Онлайн режим</h3>
+                        <p>Играйте удалённо через видеосвязь. Ведущий показывает слова через камеру.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script th:src="@{/js/index.js}"></script>
+</body>
+</html>
+

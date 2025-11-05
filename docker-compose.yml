@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: crocodile-postgres
+    environment:
+      POSTGRES_DB: crocodile_db
+      POSTGRES_USER: crocodile_user
+      POSTGRES_PASSWORD: crocodile_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crocodile-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crocodile-app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: crocodile_db
+      DB_USERNAME: crocodile_user
+      DB_PASSWORD: crocodile_pass
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - crocodile-network
+
+volumes:
+  postgres_data:
+
+networks:
+  crocodile-network:
+    driver: bridge
+

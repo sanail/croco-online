@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка - Игра "Крокодил"</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐊 Игра "Крокодил"</h1>
+        </header>
+
+        <main>
+            <div class="card error-card">
+                <h2>❌ Произошла ошибка</h2>
+                <p th:text="${error}">Что-то пошло не так</p>
+                <a href="/" class="btn btn-primary">Вернуться на главную</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

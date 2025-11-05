@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комната - Игра "Крокодил"</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐊 Игра "Крокодил"</h1>
+            <p class="room-code">Код комнаты: <strong id="roomCode" th:text="${roomCode}"></strong></p>
+        </header>
+
+        <!-- Join Form (shown before joining) -->
+        <div id="joinSection" class="card">
+            <h2>Присоединиться к игре</h2>
+            <form id="joinForm">
+                <div class="form-group">
+                    <label for="playerName">Введите ваше имя:</label>
+                    <input type="text" id="playerName" name="playerName" required 
+                           minlength="2" maxlength="50" placeholder="Ваше имя">
+                </div>
+                <button type="submit" class="btn btn-primary">Присоединиться</button>
+            </form>
+            <div id="join-error" class="error-message"></div>
+        </div>
+
+        <!-- Game Section (shown after joining) -->
+        <div id="gameSection" style="display: none;">
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">Тема:</span>
+                    <span id="theme" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Ведущий:</span>
+                    <span id="currentLeader" class="value"></span>
+                </div>
+            </div>
+
+            <!-- Leader View -->
+            <div id="leaderView" class="card leader-card" style="display: none;">
+                <h2>🎭 Вы ведущий!</h2>
+                <div id="currentWord" class="current-word">
+                    <p class="word-label">Ваше слово:</p>
+                    <p id="wordDisplay" class="word-display">Нажмите кнопку для генерации слова</p>
+                </div>
+                <div class="leader-actions">
+                    <button id="generateWordBtn" class="btn btn-primary">Сгенерировать новое слово</button>
+                </div>
+                <div class="assign-winner">
+                    <h3>Назначить победителя:</h3>
+                    <div id="playerButtons" class="player-buttons"></div>
+                </div>
+            </div>
+
+            <!-- Player View -->
+            <div id="playerView" class="card" style="display: none;">
+                <h2>Угадайте слово!</h2>
+                <div id="waitingMessage" class="waiting-message">
+                    <p>⏳ Ожидание генерации слова ведущим...</p>
+                </div>
+                <form id="guessForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="guess">Введите ваш вариант:</label>
+                        <input type="text" id="guess" name="guess" required 
+                               placeholder="Ваш ответ" autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-success">Отправить ответ</button>
+                </form>
+                <div id="guess-feedback" class="feedback-message"></div>
+            </div>
+
+            <!-- Players List -->
+            <div class="card">
+                <h2>Игроки</h2>
+                <div id="playersList" class="players-list"></div>
+            </div>
+
+            <!-- Leave Button -->
+            <div class="actions">
+                <button id="leaveBtn" class="btn btn-secondary">Покинуть комнату</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const ROOM_CODE = /*[[${roomCode}]]*/ '';
+    </script>
+    <script th:src="@{/js/room.js}"></script>
+</body>
+</html>
+
