@@ -1,7 +1,9 @@
 package com.crocodile.controller;
 
 import com.crocodile.dto.*;
-import com.crocodile.service.GameService;
+import com.crocodile.service.RoomCoordinator;
+import com.crocodile.service.GameRoundService;
+import com.crocodile.service.LeadershipService;
 import com.crocodile.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class GameController {
 
-    private final GameService gameService;
+    private final RoomCoordinator roomCoordinator;
+    private final GameRoundService gameRoundService;
+    private final LeadershipService leadershipService;
     private final SessionService sessionService;
 
     @PostMapping("/join")
@@ -30,7 +34,7 @@ public class GameController {
         String sessionId = sessionService.getOrCreateSessionId(httpRequest, httpResponse);
         log.info("Player {} joining room {}", request.getPlayerName(), roomCode);
         
-        JoinRoomResponse response = gameService.joinRoom(roomCode, sessionId, request.getPlayerName());
+        JoinRoomResponse response = roomCoordinator.joinRoom(roomCode, sessionId, request.getPlayerName());
         return ResponseEntity.ok(response);
     }
 
@@ -44,7 +48,7 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Player submitting guess in room {}", roomCode);
-        GuessResponse response = gameService.submitGuess(roomCode, sessionId, request.getGuess());
+        GuessResponse response = gameRoundService.submitGuess(roomCode, sessionId, request.getGuess());
         return ResponseEntity.ok(response);
     }
 
@@ -58,7 +62,7 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Leader assigning winner in room {}", roomCode);
-        GuessResponse response = gameService.assignWinner(roomCode, sessionId, request.getWinnerId());
+        GuessResponse response = gameRoundService.assignWinner(roomCode, sessionId, request.getWinnerId());
         return ResponseEntity.ok(response);
     }
 
@@ -71,7 +75,7 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Generating new word for room {}", roomCode);
-        NewWordResponse response = gameService.generateNewWord(roomCode, sessionId);
+        NewWordResponse response = gameRoundService.generateNewWord(roomCode, sessionId);
         return ResponseEntity.ok(response);
     }
 
@@ -84,7 +88,7 @@ public class GameController {
             .orElseThrow(() -> new IllegalStateException("No session found"));
         
         log.info("Player leaving room {}", roomCode);
-        gameService.leaveRoom(roomCode, sessionId);
+        leadershipService.handlePlayerLeave(roomCode, sessionId);
         return ResponseEntity.ok().build();
     }
 }
