@@ -223,7 +223,7 @@
 ### Самый простой способ:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Откройте: **http://localhost:8080**
@@ -232,13 +232,13 @@ docker-compose up
 
 **Java + PostgreSQL в Docker:**
 ```bash
-docker-compose up postgres
+docker compose up postgres
 java -jar target/crocodile-game-1.0.0.jar
 ```
 
 **Через Maven:**
 ```bash
-docker-compose up postgres
+docker compose up postgres
 mvn spring-boot:run
 ```
 
@@ -298,7 +298,7 @@ mvn spring-boot:run
 
 ### Что дальше?
 
-1. 🚀 **Запустите**: `docker-compose up`
+1. 🚀 **Запустите**: `docker compose up`
 2. 🎮 **Играйте**: http://localhost:8080
 3. 📖 **Изучите**: документацию для понимания
 4. 🔧 **Расширяйте**: добавьте новые фичи

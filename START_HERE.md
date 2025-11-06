@@ -8,7 +8,7 @@
 
 ```bash
 # Запустить всё одной командой
-docker-compose up --build
+docker compose up --build
 
 # Открыть в браузере
 http://localhost:8080
@@ -18,7 +18,7 @@ http://localhost:8080
 
 ```bash
 # 1. Запустить PostgreSQL
-docker-compose up postgres
+docker compose up postgres
 
 # 2. В новом терминале запустить приложение
 java -jar target/crocodile-game-1.0.0.jar
@@ -31,7 +31,7 @@ http://localhost:8080
 
 ```bash
 # 1. Запустить PostgreSQL
-docker-compose up postgres
+docker compose up postgres
 
 # 2. Запустить приложение
 mvn spring-boot:run
@@ -167,13 +167,13 @@ mvn spring-boot:run
 
 ### PostgreSQL не стартует?
 ```bash
-docker-compose down -v
-docker-compose up postgres
+docker compose down -v
+docker compose up postgres
 ```
 
 ### Нужны логи?
 ```bash
-docker-compose logs -f app
+docker compose logs -f app
 ```
 
 ## 📚 Полная документация
@@ -188,7 +188,7 @@ docker-compose logs -f app
 
 Просто выполните:
 ```bash
-docker-compose up
+docker compose up
 ```
 
 И откройте: **http://localhost:8080**

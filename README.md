@@ -49,7 +49,7 @@ git clone <repository-url>
 cd croco-online
 
 # Запустить приложение и базу данных
-docker-compose up --build
+docker compose up --build
 
 # Приложение будет доступно по адресу: http://localhost:8080
 ```
@@ -97,7 +97,7 @@ mvn spring-boot:run
 
 ```bash
 # Запустить только базу данных
-docker-compose up postgres
+docker compose up postgres
 
 # В другом терминале запустить приложение
 mvn spring-boot:run

@@ -9,7 +9,7 @@
 cd croco-online
 
 # 2. Запустить всё одной командой
-docker-compose up --build
+docker compose up --build
 
 # 3. Открыть браузер
 open http://localhost:8080
@@ -21,7 +21,7 @@ open http://localhost:8080
 
 ```bash
 # 1. Запустить только PostgreSQL в Docker
-docker-compose up postgres
+docker compose up postgres
 
 # 2. В новом терминале запустить приложение
 mvn spring-boot:run
@@ -234,7 +234,7 @@ server:
 docker ps | grep postgres
 
 # Если нет - запустить
-docker-compose up postgres
+docker compose up postgres
 
 # Проверить логи
 docker logs crocodile-postgres
@@ -244,8 +244,8 @@ docker logs crocodile-postgres
 
 ```bash
 # Пересоздать базу с нуля
-docker-compose down -v  # Удалить volumes
-docker-compose up postgres
+docker compose down -v  # Удалить volumes
+docker compose up postgres
 
 # Liquibase создаст все таблицы при старте приложения
 ```
@@ -277,12 +277,12 @@ mvn dependency:tree          # Показать зависимости
 ### Docker
 
 ```bash
-docker-compose up            # Запустить все сервисы
-docker-compose up -d         # Запустить в фоне
-docker-compose down          # Остановить все сервисы
-docker-compose down -v       # Остановить и удалить volumes
-docker-compose logs -f app   # Логи приложения
-docker-compose ps            # Статус сервисов
+docker compose up            # Запустить все сервисы
+docker compose up -d         # Запустить в фоне
+docker compose down          # Остановить все сервисы
+docker compose down -v       # Остановить и удалить volumes
+docker compose logs -f app   # Логи приложения
+docker compose ps            # Статус сервисов
 ```
 
 ### PostgreSQL
@@ -308,7 +308,7 @@ docker exec -i crocodile-postgres psql -U crocodile_user -d crocodile_db < backu
 
 ## Получить помощь
 
-- Проверьте логи: `docker-compose logs -f`
+- Проверьте логи: `docker compose logs -f`
 - Посмотрите существующие issue
 - Создайте новый issue с описанием проблемы
 
