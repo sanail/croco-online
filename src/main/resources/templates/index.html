@@ -30,16 +30,36 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group">
+                    
+                    <!-- AI Theme Source Selection -->
+                    <div id="aiThemeSourceGroup" class="form-group" style="display: none;">
+                        <label>Выбор темы:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="aiThemeSource" value="predefined" checked>
+                                <span>Из списка</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="aiThemeSource" value="custom">
+                                <span>Своя тема</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Select (shown for Database or AI with predefined) -->
+                    <div id="themeSelectGroup" class="form-group">
                         <label for="theme">Тема:</label>
-                        <select id="theme" name="theme" required>
+                        <select id="theme" name="theme">
                             <option value="">-- Выберите тему --</option>
                         </select>
                     </div>
+                    
+                    <!-- Custom Theme Input (shown for AI with custom) -->
                     <div id="customThemeGroup" class="form-group" style="display: none;">
-                        <label for="customTheme">Или введите свою тему:</label>
+                        <label for="customTheme">Своя тема:</label>
                         <input type="text" id="customTheme" name="customTheme" placeholder="Например: Космос, Динозавры...">
                     </div>
+                    
                     <button type="submit" class="btn btn-primary">Создать комнату</button>
                 </form>
                 <div id="error-message" class="error-message"></div>

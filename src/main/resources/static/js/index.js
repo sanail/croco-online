@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadThemes();
     setupCreateRoomForm();
     setupWordProviderToggle();
+    setupAiThemeSourceToggle();
 });
 
 async function loadThemes() {
@@ -25,18 +26,59 @@ async function loadThemes() {
 
 function setupWordProviderToggle() {
     const radioButtons = document.querySelectorAll('input[name="wordProvider"]');
+    const aiThemeSourceGroup = document.getElementById('aiThemeSourceGroup');
+    const themeSelectGroup = document.getElementById('themeSelectGroup');
     const customThemeGroup = document.getElementById('customThemeGroup');
     
     radioButtons.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'ai') {
-                customThemeGroup.style.display = 'block';
+                // Show AI theme source selector
+                aiThemeSourceGroup.style.display = 'block';
+                // Update visibility based on current AI theme source selection
+                updateAiThemeVisibility();
             } else {
+                // Database: show only theme select
+                aiThemeSourceGroup.style.display = 'none';
+                themeSelectGroup.style.display = 'block';
                 customThemeGroup.style.display = 'none';
+                // Make theme select required for database
+                document.getElementById('theme').required = true;
                 document.getElementById('customTheme').value = '';
             }
         });
     });
+}
+
+function setupAiThemeSourceToggle() {
+    const aiThemeSourceRadios = document.querySelectorAll('input[name="aiThemeSource"]');
+    
+    aiThemeSourceRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            updateAiThemeVisibility();
+        });
+    });
+}
+
+function updateAiThemeVisibility() {
+    const aiThemeSource = document.querySelector('input[name="aiThemeSource"]:checked')?.value;
+    const themeSelectGroup = document.getElementById('themeSelectGroup');
+    const customThemeGroup = document.getElementById('customThemeGroup');
+    const themeSelect = document.getElementById('theme');
+    
+    if (aiThemeSource === 'custom') {
+        // Show custom theme input, hide theme select
+        themeSelectGroup.style.display = 'none';
+        customThemeGroup.style.display = 'block';
+        themeSelect.required = false;
+        themeSelect.value = '';
+    } else {
+        // Show theme select, hide custom input
+        themeSelectGroup.style.display = 'block';
+        customThemeGroup.style.display = 'none';
+        themeSelect.required = true;
+        document.getElementById('customTheme').value = '';
+    }
 }
 
 function setupCreateRoomForm() {
@@ -45,19 +87,36 @@ function setupCreateRoomForm() {
         e.preventDefault();
         
         const wordProvider = document.querySelector('input[name="wordProvider"]:checked').value;
-        const theme = document.getElementById('theme').value;
-        const customTheme = document.getElementById('customTheme').value.trim();
         
-        // Validation
-        if (wordProvider === 'ai' && customTheme) {
-            // Custom theme for AI
-            await createRoom(customTheme, wordProvider, true);
-        } else if (theme) {
-            // Standard theme from list
+        if (wordProvider === 'database') {
+            // Database: must select from list
+            const theme = document.getElementById('theme').value;
+            if (!theme) {
+                showError('Пожалуйста, выберите тему из списка');
+                return;
+            }
             await createRoom(theme, wordProvider, false);
         } else {
-            showError('Пожалуйста, выберите тему из списка или введите свою');
-            return;
+            // AI: check which source is selected
+            const aiThemeSource = document.querySelector('input[name="aiThemeSource"]:checked').value;
+            
+            if (aiThemeSource === 'custom') {
+                // Custom theme: must enter text
+                const customTheme = document.getElementById('customTheme').value.trim();
+                if (!customTheme) {
+                    showError('Пожалуйста, введите название темы');
+                    return;
+                }
+                await createRoom(customTheme, wordProvider, true);
+            } else {
+                // Predefined theme: must select from list
+                const theme = document.getElementById('theme').value;
+                if (!theme) {
+                    showError('Пожалуйста, выберите тему из списка');
+                    return;
+                }
+                await createRoom(theme, wordProvider, false);
+            }
         }
     });
 }
