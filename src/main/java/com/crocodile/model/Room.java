@@ -44,6 +44,9 @@ public class Room {
     @Column(name = "word_provider_type", length = 50)
     private String wordProviderType;
 
+    @Column(name = "custom_theme", length = 255)
+    private String customTheme;
+
     @Column(name = "last_activity")
     private LocalDateTime lastActivity;
 
@@ -77,6 +80,16 @@ public class Room {
      */
     public void setCurrentWordValue(WordValue wordValue) {
         this.currentWord = wordValue == null ? null : wordValue.getValue();
+    }
+    
+    /**
+     * Get the effective theme for word generation
+     * Returns customTheme if set, otherwise returns theme
+     * 
+     * @return effective theme name
+     */
+    public String getEffectiveTheme() {
+        return customTheme != null ? customTheme : theme;
     }
 }
 

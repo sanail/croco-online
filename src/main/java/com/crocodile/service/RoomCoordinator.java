@@ -7,8 +7,7 @@ import com.crocodile.dto.PlayerDto;
 import com.crocodile.dto.RoomStateResponse;
 import com.crocodile.model.Player;
 import com.crocodile.model.Room;
-import com.crocodile.service.wordprovider.WordProvider;
-import com.crocodile.service.wordprovider.WordProviderFactory;
+import com.crocodile.service.themeprovider.ThemeProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  * - Room creation
  * - Player joining rooms
  * - Room state aggregation and queries
- * - Theme management
+ * - Theme management delegation
  * 
  * This service can be completely replaced without affecting other components.
  */
@@ -35,23 +34,28 @@ public class RoomCoordinator {
 
     private final RoomService roomService;
     private final PlayerService playerService;
-    private final WordProviderFactory wordProviderFactory;
+    private final ThemeProvider themeProvider;
 
     /**
      * Create a new game room
      * 
-     * @param theme the theme for word generation
+     * @param theme the theme for word generation (from list or custom)
      * @param wordProviderType the type of word provider to use
+     * @param isCustomTheme whether the theme is custom (user-entered)
      * @return room creation response with code and URL
      */
     @Transactional
-    public CreateRoomResponse createRoom(String theme, String wordProviderType) {
-        Room room = roomService.createRoom(theme, wordProviderType);
+    public CreateRoomResponse createRoom(String theme, String wordProviderType, boolean isCustomTheme) {
+        String customTheme = isCustomTheme ? theme : null;
+        // For custom themes, store a placeholder in the standard theme field
+        String standardTheme = isCustomTheme ? "Пользовательская тема" : theme;
+        
+        Room room = roomService.createRoom(standardTheme, wordProviderType, customTheme);
         
         return CreateRoomResponse.builder()
             .roomCode(room.getCode().getValue())
             .roomUrl("/room/" + room.getCode().getValue())
-            .theme(room.getTheme())
+            .theme(room.getEffectiveTheme())
             .build();
     }
 
@@ -128,14 +132,13 @@ public class RoomCoordinator {
     }
 
     /**
-     * Get supported themes for a word provider
+     * Get available themes
+     * Themes are now universal and not tied to specific word providers
      * 
-     * @param wordProviderType the type of word provider
-     * @return list of supported themes
+     * @return list of available themes
      */
-    public List<String> getSupportedThemes(String wordProviderType) {
-        WordProvider wordProvider = wordProviderFactory.getProvider(wordProviderType);
-        return wordProvider.getSupportedThemes();
+    public List<String> getAvailableThemes() {
+        return themeProvider.getAvailableThemes();
     }
 
     /**

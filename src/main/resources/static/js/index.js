@@ -2,11 +2,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
     await loadThemes();
     setupCreateRoomForm();
+    setupWordProviderToggle();
 });
 
 async function loadThemes() {
     try {
-        const response = await fetch('/api/rooms/themes?provider=database');
+        const response = await fetch('/api/rooms/themes');
         const themes = await response.json();
         
         const themeSelect = document.getElementById('theme');
@@ -22,23 +23,46 @@ async function loadThemes() {
     }
 }
 
+function setupWordProviderToggle() {
+    const radioButtons = document.querySelectorAll('input[name="wordProvider"]');
+    const customThemeGroup = document.getElementById('customThemeGroup');
+    
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'ai') {
+                customThemeGroup.style.display = 'block';
+            } else {
+                customThemeGroup.style.display = 'none';
+                document.getElementById('customTheme').value = '';
+            }
+        });
+    });
+}
+
 function setupCreateRoomForm() {
     const form = document.getElementById('createRoomForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        const wordProvider = document.querySelector('input[name="wordProvider"]:checked').value;
         const theme = document.getElementById('theme').value;
+        const customTheme = document.getElementById('customTheme').value.trim();
         
-        if (!theme) {
-            showError('Пожалуйста, выберите тему');
+        // Validation
+        if (wordProvider === 'ai' && customTheme) {
+            // Custom theme for AI
+            await createRoom(customTheme, wordProvider, true);
+        } else if (theme) {
+            // Standard theme from list
+            await createRoom(theme, wordProvider, false);
+        } else {
+            showError('Пожалуйста, выберите тему из списка или введите свою');
             return;
         }
-        
-        await createRoom(theme);
     });
 }
 
-async function createRoom(theme) {
+async function createRoom(theme, wordProviderType, isCustomTheme) {
     try {
         const response = await fetch('/api/rooms', {
             method: 'POST',
@@ -47,7 +71,8 @@ async function createRoom(theme) {
             },
             body: JSON.stringify({
                 theme: theme,
-                wordProviderType: 'database'
+                wordProviderType: wordProviderType,
+                customTheme: isCustomTheme
             })
         });
         

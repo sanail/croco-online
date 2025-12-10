@@ -124,7 +124,7 @@ public class GameRoundService {
         }
         
         WordProvider wordProvider = wordProviderFactory.getProvider(room.getWordProviderType());
-        String newWord = wordProvider.generateWord(room.getTheme());
+        String newWord = wordProvider.generateWord(room.getEffectiveTheme());
         
         room.setCurrentWord(newWord);
         roomService.updateRoom(room);

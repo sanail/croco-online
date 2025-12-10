@@ -32,7 +32,7 @@ public class RoomService {
     private int inactiveTimeoutMinutes;
 
     @Transactional
-    public Room createRoom(String theme, String wordProviderType) {
+    public Room createRoom(String theme, String wordProviderType, String customTheme) {
         RoomCode code = generateUniqueCode();
         
         // Validate word provider exists
@@ -41,12 +41,14 @@ public class RoomService {
         Room room = Room.builder()
             .code(code)
             .theme(theme)
+            .customTheme(customTheme)
             .status(RoomStatus.ACTIVE)
             .wordProviderType(wordProviderType)
             .build();
         
         Room savedRoom = roomRepository.save(room);
-        log.info("Created new room with code: {}, theme: {}", code, theme);
+        log.info("Created new room with code: {}, theme: {}, customTheme: {}", 
+                 code, theme, customTheme);
         
         return savedRoom;
     }

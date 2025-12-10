@@ -7,6 +7,7 @@
 
     <include file="db/changelog/changes/001-create-initial-schema.xml"/>
     <include file="db/changelog/changes/002-insert-initial-words.xml"/>
+    <include file="db/changelog/changes/003-create-themes-table.xml"/>
 
 </databaseChangeLog>
 

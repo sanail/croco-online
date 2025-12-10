@@ -29,11 +29,6 @@ public class DatabaseWordProvider implements WordProvider {
     }
 
     @Override
-    public List<String> getSupportedThemes() {
-        return wordRepository.findAllDistinctThemes();
-    }
-
-    @Override
     public String getType() {
         return "database";
     }

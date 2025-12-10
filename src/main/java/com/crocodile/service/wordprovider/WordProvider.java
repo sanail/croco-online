@@ -1,7 +1,15 @@
 package com.crocodile.service.wordprovider;
 
-import java.util.List;
-
+/**
+ * WordProvider - Black Box for Word Generation
+ * 
+ * This interface is now focused solely on word generation.
+ * Theme management has been separated into ThemeProvider.
+ * 
+ * Responsibilities:
+ * - Generate words for a given theme
+ * - Identify provider type
+ */
 public interface WordProvider {
     
     /**
@@ -10,12 +18,6 @@ public interface WordProvider {
      * @return generated word
      */
     String generateWord(String theme);
-    
-    /**
-     * Get list of supported themes
-     * @return list of theme names
-     */
-    List<String> getSupportedThemes();
     
     /**
      * Get the type identifier of this provider

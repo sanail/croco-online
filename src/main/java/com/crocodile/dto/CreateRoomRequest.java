@@ -13,6 +13,12 @@ public class CreateRoomRequest {
     @NotBlank(message = "Theme is required")
     private String theme;
     
+    @NotBlank(message = "Word provider type is required")
     private String wordProviderType = "database";
+    
+    /**
+     * Indicates if the theme is custom (user-entered) or from predefined list
+     */
+    private boolean customTheme = false;
 }
 

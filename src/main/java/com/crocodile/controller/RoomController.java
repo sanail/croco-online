@@ -26,8 +26,13 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request) {
-        log.info("Creating room with theme: {}", request.getTheme());
-        CreateRoomResponse response = roomCoordinator.createRoom(request.getTheme(), request.getWordProviderType());
+        log.info("Creating room with theme: {}, wordProvider: {}, isCustom: {}", 
+                 request.getTheme(), request.getWordProviderType(), request.isCustomTheme());
+        CreateRoomResponse response = roomCoordinator.createRoom(
+            request.getTheme(), 
+            request.getWordProviderType(),
+            request.isCustomTheme()
+        );
         return ResponseEntity.ok(response);
     }
 
@@ -43,9 +48,8 @@ public class RoomController {
     }
 
     @GetMapping("/themes")
-    public ResponseEntity<List<String>> getSupportedThemes(
-            @RequestParam(defaultValue = "database") String provider) {
-        List<String> themes = roomCoordinator.getSupportedThemes(provider);
+    public ResponseEntity<List<String>> getAvailableThemes() {
+        List<String> themes = roomCoordinator.getAvailableThemes();
         return ResponseEntity.ok(themes);
     }
 }
