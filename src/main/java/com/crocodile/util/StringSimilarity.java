@@ -81,22 +81,98 @@ public class StringSimilarity {
     }
     
     /**
-     * Capitalizes a word: first letter uppercase, rest lowercase.
+     * Capitalizes a word or phrase using title case: first letter of each word uppercase, rest lowercase.
      * Handles both Russian and Latin characters correctly.
+     * For multi-word strings, each word is capitalized independently.
+     * Multiple consecutive spaces are collapsed into single spaces.
+     * Correctly handles words starting with non-letter characters (quotes, parentheses, etc.).
      * 
-     * @param word the word to capitalize
-     * @return capitalized word (null/empty preserved)
+     * @param word the word or phrase to capitalize
+     * @return capitalized word/phrase (null/empty preserved)
      */
     public static String capitalize(String word) {
         if (word == null || word.isEmpty()) {
             return word;
         }
         
-        if (word.length() == 1) {
-            return word.toUpperCase();
+        // Split by spaces to handle multi-word strings
+        String[] words = word.split(" ");
+        StringBuilder result = new StringBuilder();
+        boolean firstWord = true;
+        
+        for (String currentWord : words) {
+            // Skip empty strings (from multiple consecutive spaces)
+            if (currentWord.isEmpty()) {
+                continue;
+            }
+            
+            // Add space before each word except the first
+            if (!firstWord) {
+                result.append(" ");
+            }
+            
+            // Capitalize the word using helper method
+            result.append(capitalizeWord(currentWord));
+            
+            firstWord = false;
         }
         
-        return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+        return result.toString();
+    }
+    
+    /**
+     * Capitalizes a single word by finding the first letter and making it uppercase,
+     * while making all other letters lowercase. Preserves non-letter prefixes
+     * (quotes, parentheses, dashes, etc.) in their original positions.
+     * 
+     * Examples:
+     * - "hello" → "Hello"
+     * - "«млечный" → "«Млечный"
+     * - "(яндекс)" → "(Яндекс)"
+     * - "123abc" → "123Abc"
+     * 
+     * @param word a single word to capitalize
+     * @return the word with first letter capitalized
+     */
+    private static String capitalizeWord(String word) {
+        if (word == null || word.isEmpty()) {
+            return word;
+        }
+        
+        // Find the index of the first letter
+        int firstLetterIndex = -1;
+        for (int i = 0; i < word.length(); i++) {
+            if (Character.isLetter(word.charAt(i))) {
+                firstLetterIndex = i;
+                break;
+            }
+        }
+        
+        // If no letters found, return as is
+        if (firstLetterIndex == -1) {
+            return word;
+        }
+        
+        // Build the result:
+        // 1. Prefix (non-letter characters before first letter)
+        // 2. First letter (uppercase)
+        // 3. Rest of the word (lowercase)
+        StringBuilder result = new StringBuilder();
+        
+        // Add prefix (if any)
+        if (firstLetterIndex > 0) {
+            result.append(word.substring(0, firstLetterIndex));
+        }
+        
+        // Add capitalized first letter
+        result.append(Character.toUpperCase(word.charAt(firstLetterIndex)));
+        
+        // Add the rest in lowercase (if any)
+        if (firstLetterIndex + 1 < word.length()) {
+            result.append(word.substring(firstLetterIndex + 1).toLowerCase());
+        }
+        
+        return result.toString();
     }
 }
 
