@@ -38,4 +38,14 @@ game:
     cookie-max-age: 86400
   score:
     points-per-win: 10
+  llm:
+    # Active LLM provider: lm-studio or yandex-gpt
+    active-provider: ${LLM_ACTIVE_PROVIDER:lm-studio}
+    lm-studio:
+      url: ${LM_STUDIO_URL:http://localhost:1234}
+      enabled: ${LM_STUDIO_ENABLED:false}
+    yandex-gpt:
+      api-key: ${YANDEX_GPT_API_KEY:}
+      folder-id: ${YANDEX_GPT_FOLDER_ID:}
+      enabled: ${YANDEX_GPT_ENABLED:false}
 

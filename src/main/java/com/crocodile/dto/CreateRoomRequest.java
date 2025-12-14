@@ -1,6 +1,7 @@
 package com.crocodile.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class CreateRoomRequest {
     private String theme;
     
     @NotBlank(message = "Word provider type is required")
+    @Pattern(regexp = "database|ai", message = "Word provider type must be 'database' or 'ai'")
     private String wordProviderType = "database";
     
     /**
