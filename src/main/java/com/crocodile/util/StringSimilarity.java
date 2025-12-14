@@ -79,5 +79,24 @@ public class StringSimilarity {
     public static boolean isCorrectGuess(WordValue word, String guess) {
         return isCorrectGuess(word.getValue(), guess);
     }
+    
+    /**
+     * Capitalizes a word: first letter uppercase, rest lowercase.
+     * Handles both Russian and Latin characters correctly.
+     * 
+     * @param word the word to capitalize
+     * @return capitalized word (null/empty preserved)
+     */
+    public static String capitalize(String word) {
+        if (word == null || word.isEmpty()) {
+            return word;
+        }
+        
+        if (word.length() == 1) {
+            return word.toUpperCase();
+        }
+        
+        return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+    }
 }
 

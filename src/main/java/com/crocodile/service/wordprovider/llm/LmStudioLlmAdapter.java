@@ -1,5 +1,6 @@
 package com.crocodile.service.wordprovider.llm;
 
+import com.crocodile.util.StringSimilarity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -125,8 +126,8 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                 throw new IllegalStateException("LM Studio returned empty text content");
             }
             
-            // Basic validation: trim whitespace
-            String word = generatedText.trim();
+            // Basic validation: trim whitespace and capitalize first letter
+            String word = StringSimilarity.capitalize(generatedText.trim());
             log.info("LM Studio generated word: {} for theme: {}", word, theme);
             
             return word;

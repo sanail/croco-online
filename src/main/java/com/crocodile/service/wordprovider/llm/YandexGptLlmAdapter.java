@@ -1,5 +1,6 @@
 package com.crocodile.service.wordprovider.llm;
 
+import com.crocodile.util.StringSimilarity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,7 +50,8 @@ public class YandexGptLlmAdapter implements LlmAdapter {
         //    - System prompt: systemPrompt (from configuration)
         //    - User prompt: String.format(userPromptTemplate, theme)
         // 3. Parse response and extract the word
-        // 4. Validate the word
+        // 4. Apply StringSimilarity.capitalize() to ensure proper capitalization
+        // 5. Validate the word
         
         log.warn("Yandex GPT integration not yet implemented, using placeholder");
         throw new UnsupportedOperationException("Yandex GPT integration not implemented yet");
