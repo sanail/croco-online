@@ -1,28 +1,72 @@
 package com.crocodile.service.wordprovider.llm;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * LM Studio LLM Adapter
  * 
- * Integrates with LM Studio's local LLM server.
- * LM Studio provides a local OpenAI-compatible API for running LLMs.
+ * Integrates with LM Studio's local LLM server using OpenAI-compatible API.
+ * LM Studio provides a local endpoint for running LLMs with the same interface as OpenAI.
+ * 
+ * Black Box Principle:
+ * - Implementation details are completely hidden behind the LlmAdapter interface
+ * - Can be replaced with any other LLM provider without affecting the system
+ * - Single responsibility: communicate with LM Studio API
  * 
  * Configuration:
  * - game.llm.lm-studio.url: LM Studio server URL
  * - game.llm.lm-studio.enabled: Enable/disable this adapter
+ * - game.llm.lm-studio.model: Model name to use
+ * - game.llm.lm-studio.temperature: Sampling temperature (0.0-2.0)
+ * - game.llm.lm-studio.max-tokens: Maximum tokens to generate
+ * - game.llm.lm-studio.timeout-seconds: Request timeout
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class LmStudioLlmAdapter implements LlmAdapter {
+
+    private final RestTemplate restTemplate;
 
     @Value("${game.llm.lm-studio.url:http://localhost:1234}")
     private String lmStudioUrl;
     
     @Value("${game.llm.lm-studio.enabled:false}")
     private boolean enabled;
+    
+    @Value("${game.llm.lm-studio.model:openai/gpt-oss-20b}")
+    private String model;
+    
+    @Value("${game.llm.lm-studio.temperature:0.7}")
+    private double temperature;
+    
+    @Value("${game.llm.lm-studio.max-tokens:10}")
+    private int maxTokens;
+    
+    @Value("${game.llm.lm-studio.timeout-seconds:10}")
+    private int timeoutSeconds;
+
+    // Cache for availability check to avoid hammering the service
+    private volatile Instant lastAvailabilityCheck = Instant.MIN;
+    private volatile boolean lastAvailabilityResult = false;
+    private static final Duration AVAILABILITY_CACHE_DURATION = Duration.ofSeconds(30);
 
     @Override
     public String generateWord(String theme) {
@@ -32,19 +76,67 @@ public class LmStudioLlmAdapter implements LlmAdapter {
             throw new IllegalStateException("LM Studio is not available. Check configuration and service status.");
         }
         
-        // TODO: Implement actual LM Studio API integration
-        // This would involve:
-        // 1. Create HTTP client request to LM Studio endpoint
-        // 2. Format prompt: "Generate a single word in Russian for the theme: {theme}"
-        // 3. Parse response and extract the word
-        // 4. Validate the word (single word, appropriate language)
-        
-        log.warn("LM Studio integration not yet implemented, using placeholder");
-        throw new UnsupportedOperationException("LM Studio integration not implemented yet");
+        try {
+            // Build the prompt for Russian word generation
+            String prompt = String.format("Сгенерируй одно слово на русском языке для темы: %s", theme);
+            
+            // Create the request
+            ChatCompletionRequest request = new ChatCompletionRequest(
+                model,
+                List.of(
+                    new Message("system", "Ты генератор слов для игры. Отвечай только одним словом на русском языке."),
+                    new Message("user", prompt)
+                ),
+                temperature,
+                maxTokens
+            );
+            
+            // Set headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<ChatCompletionRequest> httpEntity = new HttpEntity<>(request, headers);
+            
+            // Make the request
+            String endpoint = lmStudioUrl + "/v1/chat/completions";
+            log.debug("Sending request to LM Studio: {}", endpoint);
+            
+            ResponseEntity<ChatCompletionResponse> response = restTemplate.postForEntity(
+                endpoint,
+                httpEntity,
+                ChatCompletionResponse.class
+            );
+            
+            // Extract the word from response
+            ChatCompletionResponse responseBody = response.getBody();
+            if (responseBody == null || responseBody.getChoices() == null || responseBody.getChoices().isEmpty()) {
+                log.error("LM Studio returned empty response");
+                throw new IllegalStateException("LM Studio returned empty response");
+            }
+            
+            String generatedText = responseBody.getChoices().get(0).getMessage().getContent();
+            if (generatedText == null || generatedText.isBlank()) {
+                log.error("LM Studio returned empty text content");
+                throw new IllegalStateException("LM Studio returned empty text content");
+            }
+            
+            // Basic validation: trim whitespace
+            String word = generatedText.trim();
+            log.info("LM Studio generated word: {} for theme: {}", word, theme);
+            
+            return word;
+            
+        } catch (RestClientException e) {
+            log.error("Failed to communicate with LM Studio: {}", e.getMessage(), e);
+            throw new IllegalStateException("Failed to communicate with LM Studio: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error during word generation: {}", e.getMessage(), e);
+            throw new IllegalStateException("Unexpected error during word generation: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public boolean isAvailable() {
+        // Check basic configuration first
         if (!enabled) {
             log.debug("LM Studio adapter is disabled in configuration");
             return false;
@@ -55,15 +147,89 @@ public class LmStudioLlmAdapter implements LlmAdapter {
             return false;
         }
         
-        // TODO: Add actual availability check
-        // Could ping the LM Studio endpoint to verify it's running
-        log.debug("LM Studio adapter availability check - enabled: {}, url: {}", enabled, lmStudioUrl);
+        // Use cached result if available and recent
+        Instant now = Instant.now();
+        if (Duration.between(lastAvailabilityCheck, now).compareTo(AVAILABILITY_CACHE_DURATION) < 0) {
+            log.debug("Using cached availability result: {}", lastAvailabilityResult);
+            return lastAvailabilityResult;
+        }
         
-        return true;
+        // Perform actual health check by pinging the models endpoint
+        try {
+            String endpoint = lmStudioUrl + "/v1/models";
+            log.debug("Checking LM Studio availability at: {}", endpoint);
+            
+            ResponseEntity<String> response = restTemplate.getForEntity(endpoint, String.class);
+            boolean isAvailable = response.getStatusCode().is2xxSuccessful();
+            
+            // Update cache
+            lastAvailabilityCheck = now;
+            lastAvailabilityResult = isAvailable;
+            
+            log.debug("LM Studio availability check result: {}", isAvailable);
+            return isAvailable;
+            
+        } catch (RestClientException e) {
+            log.warn("LM Studio is not available: {}", e.getMessage());
+            
+            // Update cache with negative result
+            lastAvailabilityCheck = now;
+            lastAvailabilityResult = false;
+            
+            return false;
+        }
     }
 
     @Override
     public String getType() {
         return "lm-studio";
+    }
+    
+    // ==================== Inner DTO Classes for OpenAI-compatible API ====================
+    
+    /**
+     * Request DTO for OpenAI-compatible chat completion API
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class ChatCompletionRequest {
+        private String model;
+        private List<Message> messages;
+        private Double temperature;
+        @JsonProperty("max_tokens")
+        private Integer maxTokens;
+    }
+    
+    /**
+     * Message DTO for chat completion requests
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class Message {
+        private String role;
+        private String content;
+    }
+    
+    /**
+     * Response DTO for OpenAI-compatible chat completion API
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class ChatCompletionResponse {
+        private List<Choice> choices;
+    }
+    
+    /**
+     * Choice DTO representing a completion choice in the response
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class Choice {
+        private Message message;
+        private Integer index;
     }
 }

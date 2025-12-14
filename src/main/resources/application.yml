@@ -29,6 +29,14 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
+# HTTP Client Configuration
+http:
+  client:
+    # Connection timeout - how long to wait for connection to establish
+    connect-timeout-seconds: ${HTTP_CONNECT_TIMEOUT:5}
+    # Read timeout - how long to wait for response data
+    read-timeout-seconds: ${HTTP_READ_TIMEOUT:30}
+
 game:
   room:
     code-length: 6
@@ -44,6 +52,10 @@ game:
     lm-studio:
       url: ${LM_STUDIO_URL:http://localhost:1234}
       enabled: ${LM_STUDIO_ENABLED:false}
+      model: ${LM_STUDIO_MODEL:openai/gpt-oss-20b}
+      temperature: ${LM_STUDIO_TEMPERATURE:0.7}
+      max-tokens: ${LM_STUDIO_MAX_TOKENS:10}
+      timeout-seconds: ${LM_STUDIO_TIMEOUT:10}
     yandex-gpt:
       api-key: ${YANDEX_GPT_API_KEY:}
       folder-id: ${YANDEX_GPT_FOLDER_ID:}
