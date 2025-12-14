@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="013-insert-personalities-words" author="system">
+        <!-- Исторические личности -->
+        <insert tableName="words"><column name="word" value="Александр Пушкин"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Пётр Первый"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Наполеон Бонапарт"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Екатерина Великая"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Юлий Цезарь"/><column name="theme" value="Знаменитые личности"/></insert>
+        
+        <!-- Научные деятели -->
+        <insert tableName="words"><column name="word" value="Альберт Эйнштейн"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Исаак Ньютон"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Мария Кюри"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Никола Тесла"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Дмитрий Менделеев"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Стивен Хокинг"/><column name="theme" value="Знаменитые личности"/></insert>
+        
+        <!-- Писатели -->
+        <insert tableName="words"><column name="word" value="Лев Толстой"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Фёдор Достоевский"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Антон Чехов"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Уильям Шекспир"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Михаил Булгаков"/><column name="theme" value="Знаменитые личности"/></insert>
+        
+        <!-- Художники и музыканты -->
+        <insert tableName="words"><column name="word" value="Пабло Пикассо"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Леонардо да Винчи"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Винсент ван Гог"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Вольфганг Моцарт"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Людвиг Бетховен"/><column name="theme" value="Знаменитые личности"/></insert>
+        
+        <!-- Современные личности -->
+        <insert tableName="words"><column name="word" value="Илон Маск"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Билл Гейтс"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Стив Джобс"/><column name="theme" value="Знаменитые личности"/></insert>
+        <insert tableName="words"><column name="word" value="Марк Цукерберг"/><column name="theme" value="Знаменитые личности"/></insert>
+    </changeSet>
+
+</databaseChangeLog>
