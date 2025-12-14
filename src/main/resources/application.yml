@@ -57,13 +57,13 @@ game:
       max-tokens: ${LM_STUDIO_MAX_TOKENS:1000}
       timeout-seconds: ${LM_STUDIO_TIMEOUT:10}
       prompts:
-        system: "${LM_STUDIO_SYSTEM_PROMPT:Ты генератор слов для игры. Отвечай только одним словом на русском языке.}"
-        user-template: "${LM_STUDIO_USER_PROMPT:Сгенерируй одно слово на русском языке для темы: %s}"
+        system: "${LM_STUDIO_SYSTEM_PROMPT:Ты генератор слов для игры Крокодил. Отвечай только одним существительным в именительном падеже на русском языке. Никогда не используй глаголы, прилагательные или другие части речи.}"
+        user-template: "${LM_STUDIO_USER_PROMPT:Сгенерируй одно существительное в именительном падеже на русском языке для темы: %s}"
     yandex-gpt:
       api-key: ${YANDEX_GPT_API_KEY:}
       folder-id: ${YANDEX_GPT_FOLDER_ID:}
       enabled: ${YANDEX_GPT_ENABLED:false}
       prompts:
-        system: "${YANDEX_GPT_SYSTEM_PROMPT:Ты генератор слов для игры. Отвечай только одним словом на русском языке.}"
-        user-template: "${YANDEX_GPT_USER_PROMPT:Сгенерируй одно слово на русском языке для темы: %s}"
+        system: "${YANDEX_GPT_SYSTEM_PROMPT:Ты генератор слов для игры Крокодил. Отвечай только одним существительным в именительном падеже на русском языке. Никогда не используй глаголы, прилагательные или другие части речи.}"
+        user-template: "${YANDEX_GPT_USER_PROMPT:Сгенерируй одно существительное в именительном падеже на русском языке для темы: %s}"
 
