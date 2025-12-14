@@ -27,6 +27,12 @@ public class YandexGptLlmAdapter implements LlmAdapter {
     
     @Value("${game.llm.yandex-gpt.enabled:false}")
     private boolean enabled;
+    
+    @Value("${game.llm.yandex-gpt.prompts.system}")
+    private String systemPrompt;
+    
+    @Value("${game.llm.yandex-gpt.prompts.user-template}")
+    private String userPromptTemplate;
 
     @Override
     public String generateWord(String theme) {
@@ -39,10 +45,11 @@ public class YandexGptLlmAdapter implements LlmAdapter {
         // TODO: Implement actual Yandex GPT API integration
         // This would involve:
         // 1. Create HTTP client request to Yandex GPT endpoint
-        // 2. Format request with API key, folder ID, and prompt
-        // 3. Prompt: "Сгенерируй одно слово на русском языке для темы: {theme}"
-        // 4. Parse response and extract the word
-        // 5. Validate the word
+        // 2. Format request with API key, folder ID, and configured prompts:
+        //    - System prompt: systemPrompt (from configuration)
+        //    - User prompt: String.format(userPromptTemplate, theme)
+        // 3. Parse response and extract the word
+        // 4. Validate the word
         
         log.warn("Yandex GPT integration not yet implemented, using placeholder");
         throw new UnsupportedOperationException("Yandex GPT integration not implemented yet");

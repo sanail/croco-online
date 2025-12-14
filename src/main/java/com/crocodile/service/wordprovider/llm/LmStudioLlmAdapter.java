@@ -62,6 +62,12 @@ public class LmStudioLlmAdapter implements LlmAdapter {
     
     @Value("${game.llm.lm-studio.timeout-seconds:10}")
     private int timeoutSeconds;
+    
+    @Value("${game.llm.lm-studio.prompts.system}")
+    private String systemPrompt;
+    
+    @Value("${game.llm.lm-studio.prompts.user-template}")
+    private String userPromptTemplate;
 
     // Cache for availability check to avoid hammering the service
     private volatile Instant lastAvailabilityCheck = Instant.MIN;
@@ -77,15 +83,15 @@ public class LmStudioLlmAdapter implements LlmAdapter {
         }
         
         try {
-            // Build the prompt for Russian word generation
-            String prompt = String.format("Сгенерируй одно слово на русском языке для темы: %s", theme);
+            // Build the prompt for Russian word generation using configured templates
+            String userPrompt = String.format(userPromptTemplate, theme);
             
             // Create the request
             ChatCompletionRequest request = new ChatCompletionRequest(
                 model,
                 List.of(
-                    new Message("system", "Ты генератор слов для игры. Отвечай только одним словом на русском языке."),
-                    new Message("user", prompt)
+                    new Message("system", systemPrompt),
+                    new Message("user", userPrompt)
                 ),
                 temperature,
                 maxTokens
