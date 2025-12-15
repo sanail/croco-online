@@ -11,11 +11,6 @@ package com.crocodile.service.wordprovider.llm;
  * - Generate words using AI/LLM for a given theme
  * - Report availability status
  * - Identify the LLM provider type
- * 
- * Black Box Principle:
- * - Implementation details are completely hidden
- * - Each adapter can be replaced without affecting the system
- * - Simple, focused interface that's easy to implement
  */
 public interface LlmAdapter {
     

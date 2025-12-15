@@ -11,16 +11,11 @@ import java.time.Duration;
 
 /**
  * RestTemplate Configuration
- * 
+ *
  * Provides a centralized configuration for RestTemplate used across the application.
  * This allows for consistent HTTP client behavior and future customization
  * (e.g., interceptors, error handlers, timeouts).
- * 
- * Black Box Principle:
- * - Wraps external HTTP client dependency (RestTemplate) in our own configuration
- * - Allows replacing HTTP client implementation without affecting the rest of the system
- * - Provides consistent timeout behavior across all HTTP calls
- * 
+ *
  * Configuration:
  * - http.client.connect-timeout-seconds: Connection establishment timeout
  * - http.client.read-timeout-seconds: Response read timeout

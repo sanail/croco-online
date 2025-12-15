@@ -8,16 +8,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * AiWordProvider - WordProvider implementation using AI/LLM
- * 
+ *
  * This provider generates words using Large Language Models (LLMs).
  * The actual LLM used (LM Studio, Yandex GPT, etc.) is determined by
  * configuration and managed by LlmAdapterFactory.
- * 
- * Black Box Principle:
- * - Hides LLM selection complexity from the rest of the system
- * - Provides the same WordProvider interface as DatabaseWordProvider
- * - Can be swapped with other WordProvider implementations without changes
- * 
+ *
  * Responsibilities:
  * - Delegate word generation to the active LLM adapter
  * - Handle errors gracefully

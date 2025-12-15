@@ -16,11 +16,6 @@ import java.util.stream.Collectors;
  * This factory manages the selection of the active LLM adapter based on configuration.
  * It ensures that only one LLM adapter is active at a time, and that the selected
  * adapter is properly configured and available.
- * 
- * Black Box Principle:
- * - Hides the complexity of adapter selection
- * - Provides a single point of configuration for LLM provider switching
- * - Validates availability before returning an adapter
  */
 @Component
 @RequiredArgsConstructor

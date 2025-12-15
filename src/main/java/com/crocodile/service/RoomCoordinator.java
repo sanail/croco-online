@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * RoomCoordinator - Black Box for Room Lifecycle Management
- * 
+ * RoomCoordinator - Room Lifecycle Management
+ *
  * Responsibilities:
  * - Room creation
  * - Player joining rooms
  * - Room state aggregation and queries
  * - Theme management delegation
- * 
+ *
  * This service can be completely replaced without affecting other components.
  */
 @Service

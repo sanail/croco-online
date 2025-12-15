@@ -15,11 +15,6 @@ import java.util.stream.Collectors;
  * This factory manages two types of word providers:
  * - "database" - generates words from database
  * - "ai" - generates words using LLM/AI
- * 
- * Black Box Principle:
- * - Hides provider implementation details
- * - Provides simple interface for provider selection
- * - Allows easy addition of new provider types
  */
 @Component
 @RequiredArgsConstructor
