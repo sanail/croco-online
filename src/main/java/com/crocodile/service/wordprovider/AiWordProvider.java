@@ -4,12 +4,9 @@ import com.crocodile.service.wordprovider.llm.LlmAdapter;
 import com.crocodile.service.wordprovider.llm.LlmAdapterFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * AiWordProvider - WordProvider implementation using AI/LLM with word pooling
@@ -21,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Key Features:
  * - Word pooling: Maintains a pool of pre-generated words per theme
  * - Batch generation: Generates multiple words in a single LLM API call
- * - Async refill: Automatically refills the pool in the background
+ * - Async refill: Automatically refills the pool in the background via WordPoolRefiller
  * - Thread-safe: Uses WordPool with concurrent data structures
  *
  * Responsibilities:
@@ -37,19 +34,17 @@ public class AiWordProvider implements WordProvider {
 
     private final LlmAdapterFactory llmAdapterFactory;
     private final WordPool wordPool;
-    
-    @Value("${game.llm.word-pool.batch-size:20}")
-    private int batchSize;
+    private final WordPoolRefiller wordPoolRefiller;
     
     @Value("${game.llm.word-pool.initial-size:10}")
     private int initialSize;
-    
-    // Track ongoing refill operations per theme to prevent duplicate refills
-    private final ConcurrentHashMap<String, AtomicBoolean> refillInProgress = new ConcurrentHashMap<>();
 
-    public AiWordProvider(LlmAdapterFactory llmAdapterFactory, WordPool wordPool) {
+    public AiWordProvider(LlmAdapterFactory llmAdapterFactory, 
+                          WordPool wordPool,
+                          WordPoolRefiller wordPoolRefiller) {
         this.llmAdapterFactory = llmAdapterFactory;
         this.wordPool = wordPool;
+        this.wordPoolRefiller = wordPoolRefiller;
     }
 
     @Override
@@ -66,7 +61,7 @@ public class AiWordProvider implements WordProvider {
                 // Check if pool needs refill and trigger async refill
                 if (wordPool.needsRefill(theme)) {
                     log.debug("Pool for theme '{}' needs refill, triggering async refill", theme);
-                    triggerAsyncRefill(theme);
+                    wordPoolRefiller.triggerAsyncRefill(theme);
                 }
                 
                 return word;
@@ -97,7 +92,7 @@ public class AiWordProvider implements WordProvider {
             
             // Trigger async refill to fill up the pool
             if (wordPool.needsRefill(theme)) {
-                triggerAsyncRefill(theme);
+                wordPoolRefiller.triggerAsyncRefill(theme);
             }
             
             log.info("Successfully generated word using AI: '{}' for theme: '{}'", word, theme);
@@ -115,58 +110,6 @@ public class AiWordProvider implements WordProvider {
             throw new RuntimeException(
                 "Failed to generate word using AI: " + e.getMessage(), e
             );
-        }
-    }
-
-    /**
-     * Trigger asynchronous pool refill if not already in progress
-     * 
-     * @param theme the theme to refill the pool for
-     */
-    private void triggerAsyncRefill(String theme) {
-        AtomicBoolean refilling = refillInProgress.computeIfAbsent(theme, k -> new AtomicBoolean(false));
-        
-        // Only start refill if not already in progress
-        if (refilling.compareAndSet(false, true)) {
-            log.debug("Starting async refill for theme '{}'", theme);
-            refillPoolAsync(theme);
-        } else {
-            log.debug("Refill already in progress for theme '{}', skipping", theme);
-        }
-    }
-
-    /**
-     * Asynchronously refill the word pool for the given theme
-     * This method runs in a background thread managed by wordPoolTaskExecutor
-     * 
-     * @param theme the theme to refill the pool for
-     */
-    @Async("wordPoolTaskExecutor")
-    public void refillPoolAsync(String theme) {
-        try {
-            log.info("Async refill started for theme '{}'", theme);
-            
-            LlmAdapter adapter = llmAdapterFactory.getActiveAdapter();
-            
-            // Generate a batch of words
-            List<String> words = adapter.generateWords(theme, batchSize);
-            
-            if (words != null && !words.isEmpty()) {
-                wordPool.addWords(theme, words);
-                log.info("Async refill completed for theme '{}': added {} words to pool", 
-                         theme, words.size());
-            } else {
-                log.warn("Async refill for theme '{}' returned no words", theme);
-            }
-            
-        } catch (Exception e) {
-            log.error("Error during async pool refill for theme '{}': {}", theme, e.getMessage(), e);
-        } finally {
-            // Mark refill as complete
-            AtomicBoolean refilling = refillInProgress.get(theme);
-            if (refilling != null) {
-                refilling.set(false);
-            }
         }
     }
 

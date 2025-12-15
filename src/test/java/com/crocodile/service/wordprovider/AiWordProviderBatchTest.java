@@ -38,18 +38,19 @@ class AiWordProviderBatchTest {
     @Mock
     private WordPool wordPool;
     
+    @Mock
+    private WordPoolRefiller wordPoolRefiller;
+    
     private AiWordProvider aiWordProvider;
     
     private static final String TEST_THEME = "животные";
-    private static final int BATCH_SIZE = 20;
     private static final int INITIAL_SIZE = 10;
 
     @BeforeEach
     void setUp() {
-        aiWordProvider = new AiWordProvider(llmAdapterFactory, wordPool);
+        aiWordProvider = new AiWordProvider(llmAdapterFactory, wordPool, wordPoolRefiller);
         
         // Set configuration values
-        ReflectionTestUtils.setField(aiWordProvider, "batchSize", BATCH_SIZE);
         ReflectionTestUtils.setField(aiWordProvider, "initialSize", INITIAL_SIZE);
         
         // Default mock behavior - use lenient to avoid UnnecessaryStubbingException
@@ -118,8 +119,7 @@ class AiWordProviderBatchTest {
         
         assertEquals("Кошка", word);
         verify(wordPool).needsRefill(TEST_THEME);
-        // Note: We can't easily verify async method call in unit test,
-        // but we verify the logic is triggered
+        verify(wordPoolRefiller).triggerAsyncRefill(TEST_THEME);
     }
 
     @Test
@@ -189,50 +189,6 @@ class AiWordProviderBatchTest {
         });
     }
 
-    @Test
-    void testRefillPoolAsync_successfulRefill() {
-        // Prepare mock for async refill
-        List<String> batchWords = Arrays.asList(
-            "Word1", "Word2", "Word3", "Word4", "Word5",
-            "Word6", "Word7", "Word8", "Word9", "Word10",
-            "Word11", "Word12", "Word13", "Word14", "Word15",
-            "Word16", "Word17", "Word18", "Word19", "Word20"
-        );
-        when(llmAdapter.generateWords(TEST_THEME, BATCH_SIZE)).thenReturn(batchWords);
-        
-        // Call refill directly (synchronously for testing)
-        aiWordProvider.refillPoolAsync(TEST_THEME);
-        
-        verify(llmAdapter).generateWords(TEST_THEME, BATCH_SIZE);
-        verify(wordPool).addWords(TEST_THEME, batchWords);
-    }
-
-    @Test
-    void testRefillPoolAsync_llmReturnsEmpty() {
-        // LLM returns empty list
-        when(llmAdapter.generateWords(TEST_THEME, BATCH_SIZE)).thenReturn(List.of());
-        
-        // Should handle gracefully without throwing
-        assertDoesNotThrow(() -> {
-            aiWordProvider.refillPoolAsync(TEST_THEME);
-        });
-        
-        verify(wordPool, never()).addWords(any(), anyList());
-    }
-
-    @Test
-    void testRefillPoolAsync_llmThrowsException() {
-        // LLM throws exception
-        when(llmAdapter.generateWords(TEST_THEME, BATCH_SIZE))
-            .thenThrow(new RuntimeException("LLM service error"));
-        
-        // Should handle gracefully without throwing (logs error)
-        assertDoesNotThrow(() -> {
-            aiWordProvider.refillPoolAsync(TEST_THEME);
-        });
-        
-        verify(wordPool, never()).addWords(any(), anyList());
-    }
 
     @Test
     void testGetType_returnsAi() {
