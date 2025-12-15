@@ -1,5 +1,7 @@
 package com.crocodile.service.wordprovider.llm;
 
+import java.util.List;
+
 /**
  * LlmAdapter - Black Box Interface for LLM Integration
  * 
@@ -9,17 +11,22 @@ package com.crocodile.service.wordprovider.llm;
  * 
  * Responsibilities:
  * - Generate words using AI/LLM for a given theme
+ * - Support batch generation for optimization
  * - Report availability status
  * - Identify the LLM provider type
  */
 public interface LlmAdapter {
     
     /**
-     * Generate a word for the given theme using LLM
+     * Generate multiple words for the given theme using LLM (batch generation)
+     * This method is more efficient for generating multiple words at once,
+     * reducing the number of API calls to the LLM service.
+     * 
      * @param theme the theme for word generation
-     * @return generated word
+     * @param count the number of words to generate
+     * @return list of generated words
      */
-    String generateWord(String theme);
+    List<String> generateWords(String theme, int count);
     
     /**
      * Check if this LLM adapter is available and ready to use

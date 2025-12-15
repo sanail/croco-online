@@ -1,9 +1,10 @@
 package com.crocodile.service.wordprovider.llm;
 
-import com.crocodile.util.StringSimilarity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Yandex GPT LLM Adapter
@@ -36,25 +37,32 @@ public class YandexGptLlmAdapter implements LlmAdapter {
     private String userPromptTemplate;
 
     @Override
-    public String generateWord(String theme) {
-        log.info("Yandex GPT adapter generating word for theme: {}", theme);
+    public List<String> generateWords(String theme, int count) {
+        log.info("Yandex GPT adapter generating {} words for theme: {}", count, theme);
         
         if (!isAvailable()) {
             throw new IllegalStateException("Yandex GPT is not available. Check configuration (API key and folder ID).");
         }
         
-        // TODO: Implement actual Yandex GPT API integration
+        if (count <= 0) {
+            throw new IllegalArgumentException("Count must be positive, got: " + count);
+        }
+        
+        // TODO: Implement actual Yandex GPT API integration for batch generation
         // This would involve:
         // 1. Create HTTP client request to Yandex GPT endpoint
         // 2. Format request with API key, folder ID, and configured prompts:
         //    - System prompt: systemPrompt (from configuration)
-        //    - User prompt: String.format(userPromptTemplate, theme)
-        // 3. Parse response and extract the word
-        // 4. Apply StringSimilarity.capitalize() to ensure proper capitalization
-        // 5. Validate the word
+        //    - User prompt for batch: 
+        //      String.format("Сгенерируй %d различных слов или фраз в именительном падеже для темы: %s. " +
+        //                    "Верни слова списком, по одному на строке, без нумерации и дополнительного текста.",
+        //                    count, theme)
+        // 3. Parse response and extract the words (split by newlines, clean up)
+        // 4. Apply StringSimilarity.capitalize() to each word
+        // 5. Validate and return the list
         
         log.warn("Yandex GPT integration not yet implemented, using placeholder");
-        throw new UnsupportedOperationException("Yandex GPT integration not implemented yet");
+        throw new UnsupportedOperationException("Yandex GPT batch generation not implemented yet");
     }
 
     @Override

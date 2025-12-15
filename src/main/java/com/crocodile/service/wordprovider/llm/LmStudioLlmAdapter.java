@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,16 +77,23 @@ public class LmStudioLlmAdapter implements LlmAdapter {
     private static final Duration AVAILABILITY_CACHE_DURATION = Duration.ofSeconds(30);
 
     @Override
-    public String generateWord(String theme) {
-        log.info("LM Studio adapter generating word for theme: {}", theme);
+    public List<String> generateWords(String theme, int count) {
+        log.info("LM Studio adapter generating {} words for theme: {}", count, theme);
         
         if (!isAvailable()) {
             throw new IllegalStateException("LM Studio is not available. Check configuration and service status.");
         }
         
+        if (count <= 0) {
+            throw new IllegalArgumentException("Count must be positive, got: " + count);
+        }
+        
         try {
             // Build the prompt for Russian word generation using configured templates
-            String userPrompt = String.format(userPromptTemplate, theme);
+            String userPrompt = String.format(userPromptTemplate, count, theme);
+            
+            // Calculate max tokens based on count (roughly 20 tokens per word/phrase + buffer)
+            int dynamicMaxTokens = Math.max(maxTokens, count * 20 + 50);
             
             // Create the request
             ChatCompletionRequest request = new ChatCompletionRequest(
@@ -95,7 +103,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                     new Message("user", userPrompt)
                 ),
                 temperature,
-                maxTokens
+                dynamicMaxTokens
             );
             
             // Set headers
@@ -105,7 +113,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
             
             // Make the request
             String endpoint = lmStudioUrl + "/v1/chat/completions";
-            log.debug("Sending request to LM Studio: {}", endpoint);
+            log.debug("Sending batch request to LM Studio: {} (requesting {} words)", endpoint, count);
             
             ResponseEntity<ChatCompletionResponse> response = restTemplate.postForEntity(
                 endpoint,
@@ -113,7 +121,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                 ChatCompletionResponse.class
             );
             
-            // Extract the word from response
+            // Extract the words from response
             ChatCompletionResponse responseBody = response.getBody();
             if (responseBody == null || responseBody.getChoices() == null || responseBody.getChoices().isEmpty()) {
                 log.error("LM Studio returned empty response");
@@ -126,18 +134,55 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                 throw new IllegalStateException("LM Studio returned empty text content");
             }
             
-            // Basic validation: trim whitespace and capitalize first letter
-            String word = StringSimilarity.capitalize(generatedText.trim());
-            log.info("LM Studio generated word: {} for theme: {}", word, theme);
+            // Parse the response - split by newlines and clean up
+            List<String> words = new ArrayList<>();
+            String[] lines = generatedText.split("\\r?\\n");
             
-            return word;
+            for (String line : lines) {
+                String trimmed = line.trim();
+                // Skip empty lines and lines that look like numbering
+                if (!trimmed.isEmpty() && !trimmed.matches("^\\d+\\.?\\s*$")) {
+                    // Remove leading numbers if present (e.g., "1. Кошка" -> "Кошка")
+                    String cleaned = trimmed.replaceFirst("^\\d+\\.?\\s*", "");
+                    // Remove quotes if present
+                    cleaned = cleaned.replaceAll("^\"|\"$", "").trim();
+                    
+                    if (!cleaned.isEmpty()) {
+                        String word = StringSimilarity.capitalize(cleaned);
+                        words.add(word);
+                    }
+                }
+            }
+            
+            // If we didn't get enough words from newline splitting, try comma separation
+            if (words.size() < count && generatedText.contains(",")) {
+                words.clear();
+                String[] parts = generatedText.split(",");
+                for (String part : parts) {
+                    String cleaned = part.trim().replaceFirst("^\\d+\\.?\\s*", "");
+                    cleaned = cleaned.replaceAll("^\"|\"$", "").trim();
+                    if (!cleaned.isEmpty()) {
+                        words.add(StringSimilarity.capitalize(cleaned));
+                    }
+                }
+            }
+            
+            if (words.isEmpty()) {
+                log.error("Failed to parse any words from LM Studio response: {}", generatedText);
+                throw new IllegalStateException("Failed to parse words from LM Studio response");
+            }
+            
+            log.info("LM Studio generated {} words for theme: {} (requested: {})", words.size(), theme, count);
+            log.debug("Generated words: {}", words);
+            
+            return words;
             
         } catch (RestClientException e) {
             log.error("Failed to communicate with LM Studio: {}", e.getMessage(), e);
             throw new IllegalStateException("Failed to communicate with LM Studio: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Unexpected error during word generation: {}", e.getMessage(), e);
-            throw new IllegalStateException("Unexpected error during word generation: " + e.getMessage(), e);
+            log.error("Unexpected error during batch word generation: {}", e.getMessage(), e);
+            throw new IllegalStateException("Unexpected error during batch word generation: " + e.getMessage(), e);
         }
     }
 
