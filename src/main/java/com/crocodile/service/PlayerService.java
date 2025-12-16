@@ -121,7 +121,7 @@ public class PlayerService {
         }
         
         // Assign first active player as new leader
-        Player newLeader = activePlayers.get(0);
+        Player newLeader = activePlayers.getFirst();
         setLeader(newLeader.getId(), true);
         
         return newLeader;

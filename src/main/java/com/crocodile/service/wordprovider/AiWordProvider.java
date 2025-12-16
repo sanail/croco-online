@@ -81,7 +81,7 @@ public class AiWordProvider implements WordProvider {
             }
             
             // Take the first word and add the rest to the pool
-            word = words.get(0);
+            word = words.getFirst();
             
             if (words.size() > 1) {
                 List<String> remainingWords = words.subList(1, words.size());

@@ -138,7 +138,7 @@ public class YandexGptLlmAdapter implements LlmAdapter {
                 throw new IllegalStateException("Yandex GPT returned empty response");
             }
 
-            Alternative firstAlternative = responseBody.getResult().getAlternatives().get(0);
+            Alternative firstAlternative = responseBody.getResult().getAlternatives().getFirst();
             if (firstAlternative.getMessage() == null ||
                 firstAlternative.getMessage().getText() == null ||
                 firstAlternative.getMessage().getText().isBlank()) {

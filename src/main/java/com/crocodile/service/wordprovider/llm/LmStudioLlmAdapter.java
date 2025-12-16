@@ -127,7 +127,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                 throw new IllegalStateException("LM Studio returned empty response");
             }
             
-            String generatedText = responseBody.getChoices().get(0).getMessage().getContent();
+            String generatedText = responseBody.getChoices().getFirst().getMessage().getContent();
             if (generatedText == null || generatedText.isBlank()) {
                 log.error("LM Studio returned empty text content");
                 throw new IllegalStateException("LM Studio returned empty text content");
