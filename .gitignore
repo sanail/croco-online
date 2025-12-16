@@ -18,3 +18,8 @@ target/
 ### Logs ###
 *.log
 
+### Deployment ###
+deploy-package/
+authorized_key.json
+.env.prod
+
