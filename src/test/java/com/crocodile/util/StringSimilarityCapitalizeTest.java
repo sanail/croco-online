@@ -135,3 +135,4 @@ class StringSimilarityCapitalizeTest {
         assertEquals("---", StringSimilarity.capitalize("---"));
     }
 }
+
