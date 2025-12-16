@@ -1,4 +1,4 @@
-package com.crocodile.service.wordprovider.llm;
+package com.crocodile.service.wordprovider.llm.yandexgpt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

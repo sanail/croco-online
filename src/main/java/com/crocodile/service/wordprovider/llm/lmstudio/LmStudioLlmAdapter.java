@@ -1,5 +1,6 @@
-package com.crocodile.service.wordprovider.llm;
+package com.crocodile.service.wordprovider.llm.lmstudio;
 
+import com.crocodile.service.wordprovider.llm.LlmAdapter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

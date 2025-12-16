@@ -1,5 +1,6 @@
-package com.crocodile.service.wordprovider.llm;
+package com.crocodile.service.wordprovider.llm.yandexgpt;
 
+import com.crocodile.service.wordprovider.llm.LlmAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
