@@ -2,12 +2,10 @@ package com.crocodile.service.wordprovider;
 
 import com.crocodile.model.Word;
 import com.crocodile.repository.WordRepository;
-import com.crocodile.util.StringSimilarity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class DatabaseWordProvider implements WordProvider {
             return getFallbackWord(theme);
         }
         
-        return StringSimilarity.capitalize(word.getWord());
+        return word.getWord();
     }
 
     @Override

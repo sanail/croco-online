@@ -1,6 +1,5 @@
 package com.crocodile.service.wordprovider.llm;
 
-import com.crocodile.util.StringSimilarity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -148,8 +147,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                     cleaned = cleaned.replaceAll("^\"|\"$", "").trim();
                     
                     if (!cleaned.isEmpty()) {
-                        String word = StringSimilarity.capitalize(cleaned);
-                        words.add(word);
+                        words.add(cleaned);
                     }
                 }
             }
@@ -162,7 +160,7 @@ public class LmStudioLlmAdapter implements LlmAdapter {
                     String cleaned = part.trim().replaceFirst("^\\d+\\.?\\s*", "");
                     cleaned = cleaned.replaceAll("^\"|\"$", "").trim();
                     if (!cleaned.isEmpty()) {
-                        words.add(StringSimilarity.capitalize(cleaned));
+                        words.add(cleaned);
                     }
                 }
             }
