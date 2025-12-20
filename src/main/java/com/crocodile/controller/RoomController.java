@@ -52,5 +52,12 @@ public class RoomController {
         List<String> themes = roomCoordinator.getAvailableThemes();
         return ResponseEntity.ok(themes);
     }
+
+    @GetMapping("/{code}/exists")
+    public ResponseEntity<Boolean> checkRoomExists(@PathVariable String code) {
+        RoomCode roomCode = RoomCode.of(code);
+        boolean exists = roomCoordinator.roomExists(roomCode);
+        return ResponseEntity.ok(exists);
+    }
 }
 

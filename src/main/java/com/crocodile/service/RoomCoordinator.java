@@ -132,6 +132,21 @@ public class RoomCoordinator {
     }
 
     /**
+     * Check if a room exists and is active
+     * 
+     * @param roomCode the room code to check
+     * @return true if the room exists and is active, false otherwise
+     */
+    public boolean roomExists(RoomCode roomCode) {
+        try {
+            Room room = roomService.getRoomByCode(roomCode);
+            return room.getStatus() == com.crocodile.model.RoomStatus.ACTIVE;
+        } catch (com.crocodile.exception.RoomNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
      * Get available themes
      * Themes are now universal and not tied to specific word providers
      * 

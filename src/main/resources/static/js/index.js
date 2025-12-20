@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     await loadThemes();
     setupCreateRoomForm();
+    setupJoinRoomForm();
     setupWordProviderToggle();
     setupAiThemeSourceToggle();
 });
@@ -121,6 +122,22 @@ function setupCreateRoomForm() {
     });
 }
 
+function setupJoinRoomForm() {
+    const form = document.getElementById('joinRoomForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+        
+        if (roomCode.length < 4) {
+            showJoinError('Код комнаты должен содержать минимум 4 символа');
+            return;
+        }
+        
+        await joinExistingRoom(roomCode);
+    });
+}
+
 async function createRoom(theme, wordProviderType, isCustomTheme) {
     try {
         const response = await fetch('/api/rooms', {
@@ -181,5 +198,39 @@ function copyToClipboard(text) {
     }).catch(err => {
         console.error('Failed to copy:', err);
     });
+}
+
+async function joinExistingRoom(roomCode) {
+    try {
+        // First, check if the room exists
+        const response = await fetch(`/api/rooms/${roomCode}/exists`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to check room existence');
+        }
+        
+        const exists = await response.json();
+        
+        if (exists) {
+            // Room exists, redirect to room page
+            window.location.href = `/room/${roomCode}`;
+        } else {
+            // Room doesn't exist or is inactive
+            showJoinError('Комната с таким кодом не найдена или неактивна');
+        }
+    } catch (error) {
+        console.error('Error joining room:', error);
+        showJoinError('Не удалось проверить существование комнаты. Попробуйте ещё раз.');
+    }
+}
+
+function showJoinError(message) {
+    const errorDiv = document.getElementById('join-error-message');
+    errorDiv.textContent = message;
+    errorDiv.classList.add('show');
+    
+    setTimeout(() => {
+        errorDiv.classList.remove('show');
+    }, 5000);
 }
 

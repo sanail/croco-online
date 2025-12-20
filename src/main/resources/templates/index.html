@@ -78,6 +78,19 @@
             </div>
 
             <div class="card">
+                <h2>Войти в существующую комнату</h2>
+                <form id="joinRoomForm">
+                    <div class="form-group">
+                        <label for="roomCode">Введите код комнаты:</label>
+                        <input type="text" id="roomCode" name="roomCode" required 
+                               minlength="4" maxlength="10" placeholder="Например: ABC123">
+                    </div>
+                    <button type="submit" class="btn btn-success">Войти в комнату</button>
+                </form>
+                <div id="join-error-message" class="error-message"></div>
+            </div>
+
+            <div class="card">
                 <h2>Как играть?</h2>
                 <ol class="instructions">
                     <li>Создайте комнату и выберите тему</li>
