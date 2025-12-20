@@ -15,7 +15,7 @@ docker compose up --build
 open http://localhost:8080
 ```
 
-Готово! 🎉
+Готово! 🎉 По умолчанию используются слова из базы данных.
 
 ### Вариант 2: Локальная разработка
 
@@ -28,6 +28,31 @@ mvn spring-boot:run
 
 # 3. Открыть браузер
 open http://localhost:8080
+```
+
+### Вариант 3: С AI генерацией (LM Studio)
+
+```bash
+# 1. Запустить LM Studio на порту 1234
+# 2. Настроить переменные окружения
+export LLM_ACTIVE_PROVIDER=lm-studio
+export LM_STUDIO_ENABLED=true
+
+# 3. Запустить приложение
+docker compose up --build
+```
+
+### Вариант 4: С AI генерацией (Yandex GPT)
+
+```bash
+# 1. Настроить Yandex Cloud (см. YANDEX_GPT_SETUP.md)
+export LLM_ACTIVE_PROVIDER=yandex-gpt
+export YANDEX_GPT_ENABLED=true
+export YANDEX_GPT_AUTH_KEY_PATH=/path/to/authorized_key.json
+export YANDEX_GPT_FOLDER_ID=your-folder-id
+
+# 2. Запустить приложение
+docker compose up --build
 ```
 
 ## Первые шаги
@@ -59,10 +84,43 @@ open http://localhost:8080
 
 ## Тестовые сценарии
 
-### Сценарий 1: Игра с автоматическим угадыванием
+### Сценарий 1: Игра с AI генерацией (YandexGPT)
 
 ```bash
-# Терминал 1: Создать комнату и получить код
+# Настроить YandexGPT
+export LLM_ACTIVE_PROVIDER=yandex-gpt
+export YANDEX_GPT_ENABLED=true
+export YANDEX_GPT_AUTH_KEY_PATH=/path/to/authorized_key.json
+export YANDEX_GPT_FOLDER_ID=b1xxxxxxxxxxxxxx
+
+# Запустить приложение
+docker compose up -d
+
+# Создать комнату с AI генерацией
+curl -X POST http://localhost:8080/api/rooms \
+  -H "Content-Type: application/json" \
+  -d '{"theme":"Животные","wordProviderType":"ai"}'
+
+# Получите roomCode из ответа, например "ABC123"
+
+# Присоединиться как Player 1
+curl -X POST http://localhost:8080/api/rooms/ABC123/join \
+  -H "Content-Type: application/json" \
+  -c cookies1.txt \
+  -d '{"playerName":"Player1"}'
+
+# Player 1 генерирует слово (будет использован YandexGPT)
+curl -X POST http://localhost:8080/api/rooms/ABC123/new-word \
+  -b cookies1.txt
+
+# Слово будет сгенерировано AI и добавлено в WordPool
+# Последующие запросы будут мгновенными (из пула)
+```
+
+### Сценарий 2: Игра с автоматическим угадыванием
+
+```bash
+# Создать комнату
 curl -X POST http://localhost:8080/api/rooms \
   -H "Content-Type: application/json" \
   -d '{"theme":"Животные","wordProviderType":"database"}'
@@ -99,16 +157,25 @@ curl -X POST http://localhost:8080/api/rooms/ABC123/guess \
 curl http://localhost:8080/api/rooms/ABC123/state -b cookies2.txt
 ```
 
-### Сценарий 2: Ручное назначение победителя
+### Сценарий 3: Тестирование WordPool
 
 ```bash
-# После присоединения двух игроков...
+# Запустить с AI провайдером
+export LLM_ACTIVE_PROVIDER=lm-studio
+export LM_STUDIO_ENABLED=true
+export LLM_BATCH_SIZE=20
+export LLM_MIN_THRESHOLD=5
 
-# Ведущий назначает победителя вручную
-curl -X POST http://localhost:8080/api/rooms/ABC123/assign-winner \
-  -H "Content-Type: application/json" \
-  -b cookies1.txt \
-  -d '{"winnerId":2}'  # ID второго игрока
+mvn spring-boot:run
+
+# В логах увидите:
+# "Async refill started for theme 'животные'"
+# "LM Studio generated 20 words for theme: животные"
+# "Async refill completed: added 20 words to pool"
+
+# Первый запрос - синхронная генерация (10 слов)
+# Последующие запросы - instant из пула
+# При снижении до 5 слов - автоматический async refill
 ```
 
 ## Проверка работоспособности
@@ -129,6 +196,21 @@ curl http://localhost:8080/api/rooms/themes
 
 # Ответ:
 # ["Животные","Профессии","Предметы быта","Фильмы и сериалы","Еда и напитки","Спорт","Города и страны"]
+```
+
+### Проверить LLM провайдеры
+
+```bash
+# Проверить YandexGPT
+curl -X POST http://localhost:8080/api/rooms \
+  -H "Content-Type: application/json" \
+  -d '{"theme":"Животные","wordProviderType":"ai"}' \
+  | jq
+
+# В логах увидите JWT генерацию и IAM token обмен
+
+# Проверить LM Studio доступность
+curl http://localhost:1234/v1/models
 ```
 
 ### Проверить базу данных
@@ -187,6 +269,20 @@ mvn spring-boot:run
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
 
 # В IntelliJ IDEA: Run → Attach to Process → выбрать порт 5005
+```
+
+### Мониторинг WordPool
+
+```bash
+# Включить debug логи для WordPool
+export LOGGING_LEVEL_COM_CROCODILE_SERVICE_WORDPROVIDER=DEBUG
+
+mvn spring-boot:run
+
+# В логах увидите:
+# [word-pool-refill-1] DEBUG - Pool for theme 'животные' needs refill
+# [word-pool-refill-1] DEBUG - Current pool size: 4, threshold: 5
+# [word-pool-refill-2] DEBUG - Async refill completed: 20 words added
 ```
 
 ## Тестирование
@@ -250,6 +346,46 @@ docker compose up postgres
 # Liquibase создаст все таблицы при старте приложения
 ```
 
+### LLM провайдер не работает
+
+**YandexGPT:**
+```bash
+# Проверить путь к ключу
+ls -la $YANDEX_GPT_AUTH_KEY_PATH
+
+# Проверить логи IAM token
+docker compose logs app | grep "IAM token"
+
+# Проверить права доступа
+chmod 600 $YANDEX_GPT_AUTH_KEY_PATH
+```
+
+**LM Studio:**
+```bash
+# Проверить доступность
+curl http://localhost:1234/v1/models
+
+# Проверить timeout
+export LM_STUDIO_TIMEOUT=30
+
+# Увеличить read timeout для медленных моделей
+export HTTP_READ_TIMEOUT=60
+```
+
+### WordPool не пополняется
+
+```bash
+# Проверить async потоки в логах
+docker compose logs app | grep "word-pool-refill"
+
+# Должны видеть:
+# [word-pool-refill-1] INFO - Async refill started
+# [word-pool-refill-1] INFO - Async refill completed
+
+# Если видите [http-nio-8080-exec-X] - async не работает
+# Проверьте AsyncConfig
+```
+
 ### Тесты падают
 
 ```bash
@@ -302,9 +438,11 @@ docker exec -i crocodile-postgres psql -U crocodile_user -d crocodile_db < backu
 
 1. 📖 Прочитайте [ARCHITECTURE.md](ARCHITECTURE.md) для понимания структуры
 2. ⚙️ Изучите [CONFIGURATION.md](CONFIGURATION.md) для настройки
-3. 🔧 Начните разработку новых фичей
-4. 🧪 Добавьте больше тестов
-5. 🚀 Задеплойте в production
+3. 🤖 Настройте AI генерацию: [YANDEX_GPT_SETUP.md](YANDEX_GPT_SETUP.md)
+4. 📊 Узнайте про оптимизацию: [LLM_BATCH_OPTIMIZATION.md](LLM_BATCH_OPTIMIZATION.md)
+5. 🔧 Начните разработку новых фичей
+6. 🧪 Добавьте больше тестов
+7. 🚀 Задеплойте в production
 
 ## Получить помощь
 

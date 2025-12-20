@@ -14,6 +14,8 @@ docker compose up --build
 http://localhost:8080
 ```
 
+По умолчанию используются слова из базы данных.
+
 #### Вариант 2: Только Java + PostgreSQL в Docker
 
 ```bash
@@ -27,49 +29,32 @@ java -jar target/crocodile-game-1.0.0.jar
 http://localhost:8080
 ```
 
-#### Вариант 3: Через Maven
+#### Вариант 3: С AI генерацией (YandexGPT)
 
 ```bash
-# 1. Запустить PostgreSQL
-docker compose up postgres
+# Настроить переменные окружения
+export LLM_ACTIVE_PROVIDER=yandex-gpt
+export YANDEX_GPT_ENABLED=true
+export YANDEX_GPT_AUTH_KEY_PATH=/path/to/authorized_key.json
+export YANDEX_GPT_FOLDER_ID=your-folder-id
 
-# 2. Запустить приложение
-mvn spring-boot:run
+# Запустить
+docker compose up --build
 ```
 
-## 📋 Что уже реализовано
+См. [YANDEX_GPT_SETUP.md](YANDEX_GPT_SETUP.md) для детальной настройки.
 
-### ✅ Backend (Java 21 + Spring Boot 3)
-- 39 Java классов с полной бизнес-логикой
-- REST API (8 endpoints)
-- Session management через cookies
-- Strategy Pattern для расширяемости
-- Exception handling
-- Scheduled tasks для очистки
+#### Вариант 4: С AI генерацией (LM Studio)
 
-### ✅ Frontend (Thymeleaf + JS)
-- 3 HTML страницы
-- Адаптивный CSS дизайн (448 строк)
-- Real-time обновления через polling
-- Динамический UI для ведущего/игрока
+```bash
+# 1. Запустить LM Studio на порту 1234
+# 2. Настроить переменные
+export LLM_ACTIVE_PROVIDER=lm-studio
+export LM_STUDIO_ENABLED=true
 
-### ✅ Database (PostgreSQL + Liquibase)
-- 4 таблицы с индексами
-- 105 предустановленных слов
-- 7 тем для игры
-- Автоматические миграции
-
-### ✅ DevOps
-- Docker & Docker Compose
-- Multi-stage Dockerfile
-- Production-ready конфигурация
-
-### ✅ Documentation
-- README.md - общее описание
-- ARCHITECTURE.md - архитектура системы
-- QUICKSTART.md - быстрый старт с примерами
-- CONFIGURATION.md - настройки
-- IMPLEMENTATION_SUMMARY.md - что реализовано
+# 3. Запустить
+docker compose up --build
+```
 
 ## 🎮 Как играть
 
@@ -77,21 +62,10 @@ mvn spring-boot:run
 2. **Пригласить друзей**: Поделиться ссылкой
 3. **Присоединиться**: Ввести имя
 4. **Играть**:
-   - Ведущий генерирует слово и показывает жестами
+   - Ведущий генерирует слово (из БД или через AI) и показывает жестами
    - Игроки угадывают и вводят ответы
    - Угадавший становится новым ведущим (+10 очков)
-
-## 📊 Статус компиляции и тестов
-
-```
-✅ Компиляция: УСПЕШНО
-✅ JAR собран: target/crocodile-game-1.0.0.jar (50MB)
-✅ Unit тесты: ПРОШЛИ (StringSimilarity, RoomCodeGenerator)
-✅ Код компилируется без ошибок
-✅ Готов к запуску
-```
-
-**Примечание о тестах**: Некоторые mock-тесты могут не работать в sandbox окружении, но это не влияет на работу приложения. Основной код полностью функционален.
+   - С AI генерацией слова создаются бесконечно и уникально!
 
 ## 🏗️ Архитектура
 
@@ -100,7 +74,11 @@ Browser (HTML/CSS/JS)
     ↓ REST API
 Spring Boot (Controllers)
     ↓
-Services (Game Logic)
+Services (RoomCoordinator, GameRoundService, LeadershipService)
+    ↓
+WordProvider (Database / AI with WordPool)
+    ↓
+LLM Adapters (YandexGPT with JWT / LM Studio)
     ↓
 Repositories (JPA)
     ↓
@@ -109,9 +87,10 @@ PostgreSQL Database
 
 ## 🔧 Технологии
 
-- **Backend**: Java 21, Spring Boot 3.2, Spring Data JPA
+- **Backend**: Java 21, Spring Boot 3.5.6, Spring Data JPA, Spring Async
 - **Frontend**: Thymeleaf, HTML5, CSS3, Vanilla JavaScript
 - **Database**: PostgreSQL 15
+- **AI/LLM**: YandexGPT (JWT auth), LM Studio, WordPool optimization
 - **Build**: Maven
 - **Deploy**: Docker, Docker Compose
 - **Migrations**: Liquibase
@@ -123,6 +102,12 @@ croco-online/
 ├── src/main/java/com/crocodile/
 │   ├── controller/       # REST + View контроллеры
 │   ├── service/          # Бизнес-логика
+│   │   ├── wordprovider/ # Strategy для генерации слов
+│   │   │   ├── llm/      # LLM адаптеры (YandexGPT, LM Studio)
+│   │   │   ├── WordPool.java
+│   │   │   └── WordPoolRefiller.java
+│   │   └── ...
+│   ├── config/           # AsyncConfig, RestTemplateConfig
 │   ├── repository/       # JPA repositories
 │   ├── model/            # Entities
 │   ├── dto/              # Data transfer objects
@@ -132,6 +117,10 @@ croco-online/
 │   ├── templates/        # HTML (Thymeleaf)
 │   ├── static/           # CSS, JS
 │   └── db/changelog/     # Liquibase migrations
+├── deploy-package/       # Production deployment
+│   ├── docker-compose.prod.yml
+│   ├── scripts/          # deploy, backup, healthcheck
+│   └── secrets/          # authorized_key.json
 ├── docker-compose.yml    # Docker setup
 ├── Dockerfile           # Application image
 └── README.md            # Документация
@@ -141,6 +130,10 @@ croco-online/
 
 - ✅ Создание комнат с уникальными кодами
 - ✅ 7 тем: Животные, Профессии, Предметы быта, Фильмы, Еда, Спорт, Города
+- ✅ **AI генерация слов через YandexGPT или LM Studio**
+- ✅ **Batch optimization (~95% снижение LLM API вызовов)**
+- ✅ **Асинхронное пополнение пула слов**
+- ✅ Генерация из базы данных (105 предзаполненных слов)
 - ✅ Автоматическая смена ведущего
 - ✅ Ручное назначение победителя
 - ✅ Система очков
@@ -149,13 +142,12 @@ croco-online/
 - ✅ Адаптивный дизайн для мобильных
 - ✅ 2 режима: Оффлайн и Онлайн
 
-## 🔮 Готово для расширения
+## 🚧 Легко добавить
 
-- 🚧 YandexGPT интеграция (интерфейс готов)
-- 🚧 LM Studio интеграция (интерфейс готов)
-- 🚧 WebSocket (вместо polling)
-- 🚧 Таймер раундов
-- 🚧 Видеосвязь
+- WebSocket (вместо polling)
+- Таймер раундов
+- Видеосвязь
+- Новые темы (просто добавить в БД)
 
 ## 🆘 Помощь
 
@@ -183,17 +175,37 @@ docker compose logs -f app
 - ⚡ [QUICKSTART.md](QUICKSTART.md) - Быстрый старт с примерами
 - ⚙️ [CONFIGURATION.md](CONFIGURATION.md) - Конфигурация
 - ✅ [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Что реализовано
+- 🤖 [YANDEX_GPT_SETUP.md](YANDEX_GPT_SETUP.md) - Настройка YandexGPT
+- 📦 [LLM_BATCH_OPTIMIZATION.md](LLM_BATCH_OPTIMIZATION.md) - Batch оптимизация
+- 🔄 [ASYNC_FIX_EXPLANATION.md](ASYNC_FIX_EXPLANATION.md) - Async исправления
 
 ## 🎉 Готово к использованию!
 
-Просто выполните:
+### Базовый запуск (слова из БД):
 ```bash
+docker compose up
+```
+
+### С AI генерацией (YandexGPT):
+```bash
+export LLM_ACTIVE_PROVIDER=yandex-gpt
+export YANDEX_GPT_ENABLED=true
+export YANDEX_GPT_AUTH_KEY_PATH=/path/to/authorized_key.json
+export YANDEX_GPT_FOLDER_ID=your-folder-id
+docker compose up
+```
+
+### С AI генерацией (LM Studio):
+```bash
+# Запустить LM Studio локально
+export LLM_ACTIVE_PROVIDER=lm-studio
+export LM_STUDIO_ENABLED=true
 docker compose up
 ```
 
 И откройте: **http://localhost:8080**
 
-**Приятной игры! 🐊🎮**
+**Приятной игры с AI генерацией! 🐊🎮🤖**
 
 ---
 
